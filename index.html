@@ -177,6 +177,26 @@ h2.sec{font-size:20px;margin:22px 0 4px}
 .tester{border:1px dashed #3a3f4a;border-radius:12px;padding:10px 14px;color:var(--muted);font-size:13px;margin-bottom:14px}
 .tester b{color:var(--text)}
 
+/* demo student bar */
+.demobar{margin:14px 28px 0;padding:12px 16px;border:1px solid #4a4220;background:linear-gradient(90deg,#1f1c10,#191b20);border-radius:14px}
+.demohead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.demohead .mono{color:var(--gold);letter-spacing:.06em}
+.demohint{color:var(--muted)!important;letter-spacing:0!important}
+.pchips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.pchip{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer;text-align:left}
+.pchip b{font-size:16px}.pchip small{font-size:12px;color:var(--muted)}
+.pchip:hover{border-color:var(--muted)}
+.pchip[aria-pressed=true]{border-color:var(--gold);background:#2a2615;box-shadow:0 0 0 1px var(--gold) inset}
+.pchip[aria-pressed=true] small{color:#e9d9a0}
+#personaStory{margin:10px 0 0;color:#d5d9e0;font-size:14px}
+body.testing .demobar{display:none}
+/* ACE character */
+.botwrap{flex:none;display:flex;flex-direction:column;align-items:center;width:140px;gap:2px}
+.bot{width:92px;height:auto}
+.bubble{position:relative;max-width:140px;text-align:center;background:var(--text);color:#111;font-weight:700;font-size:12px;line-height:1.25;padding:5px 10px;border-radius:12px}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:var(--text)}
+.headrow{align-items:center}
+.headrow h1{flex:1;min-width:260px}
 /* advisor */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
 .chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--muted)}
@@ -240,6 +260,9 @@ body.testing .app{grid-template-columns:1fr}
   .top{padding:12px 16px}.crumb{display:none}
   .tabs,.view{padding-left:16px;padding-right:16px}
   .grid3,.grid2,.grid4,.grid2eq,.advgrid{grid-template-columns:1fr}
+  .demobar{margin:10px 16px 0}.demohint{display:none}
+  .botwrap{flex-direction:row;width:auto;gap:8px}.bot{width:60px;order:-1}
+  .bubble::after{left:-5px;top:50%;bottom:auto;margin:-5px 0 0;border:5px solid transparent;border-left:0;border-right-color:var(--text)}
   .advprep{position:static}
   .more summary .mono{display:none}
 }
@@ -261,15 +284,15 @@ body.testing .app{grid-template-columns:1fr}
       <div class="navsep"></div>
       <a href="#ace" onclick="return false">Settings</a>
     </nav>
-    <div class="persona">
-      <label for="personaSel">DEMO STUDENT (SYNTHETIC)</label>
-      <select id="personaSel" aria-describedby="personaStory"></select>
-      <p id="personaStory"></p>
-    </div>
   </aside>
 
   <main id="ace-main" tabindex="-1">
     <div class="top"><div class="search">Search Flashline…</div><div class="crumb mono">flashline / student / <b>ace</b></div></div>
+    <div class="demobar" id="demobar" role="group" aria-labelledby="demoLab">
+      <div class="demohead"><span id="demoLab" class="mono">VIEWING AS A DEMO STUDENT (SYNTHETIC)</span><span class="mono demohint">switch to see how ACE changes</span></div>
+      <div class="pchips" id="personaChips"></div>
+      <p id="personaStory" aria-live="polite"></p>
+    </div>
     <div class="tabs" role="tablist" aria-label="Prototype views">
       <button role="tab" aria-selected="true" aria-controls="v-dash" id="t-dash">Dashboard</button>
       <button role="tab" aria-selected="false" aria-controls="v-phone" id="t-phone">Phone</button>
@@ -284,6 +307,7 @@ body.testing .app{grid-template-columns:1fr}
     <section class="view" id="v-dash" role="tabpanel" aria-labelledby="t-dash">
       <div class="eyebrow">ACE / Academic &amp; Career Executive Assistant</div>
       <div class="headrow">
+        <div class="botwrap"><span class="bubble" id="botSay" aria-live="polite">Morning!</span><img id="botImg" class="bot" src="assets/ace-hello.gif" alt="ACE, the assistant character" width="96" height="106"></div>
         <h1 id="headline">Loading your day…</h1>
         <div class="pills">
           <span class="pill mono" id="syncPill"><span class="dot"></span><span id="syncText">connecting…</span></span>
@@ -323,6 +347,7 @@ body.testing .app{grid-template-columns:1fr}
           </div>
           <div id="panel" hidden>
             <button class="btn" id="relock" type="button" style="font-size:12px;margin-bottom:10px">‹ Lock screen</button>
+            <img src="assets/ace-happy.gif" alt="" width="56" height="62" style="float:right;margin:-6px -4px 0 6px">
             <div class="eyebrow" style="font-size:11px">ACE · OPENED FROM KSUMOBILE</div>
             <h3 id="pHead"></h3>
             <div id="pPrios"></div>
@@ -513,6 +538,16 @@ function toast(title, body) {
   m.querySelector("#mclose").focus();
 }
 
+/* ===================== ACE character ===================== */
+const BOT = { hello: "assets/ace-hello.gif", thinking: "assets/ace-thinking.gif", happy: "assets/ace-happy.gif",
+              alert: "assets/ace-alert.gif", wink: "assets/ace-wink.gif", done: "assets/ace-done.gif" };
+Object.values(BOT).forEach(src => { const i = new Image(); i.src = src; });   // preload so mood swaps don't flash
+function setBot(mood, say) {
+  const img = document.getElementById("botImg"); if (!img) return;
+  if (!img.src.endsWith(BOT[mood])) img.src = BOT[mood];
+  if (say) document.getElementById("botSay").textContent = say;
+}
+
 /* ===================== render ===================== */
 const state = { personas: [], snap: null, brief: null, engine: "" };
 
@@ -534,6 +569,10 @@ function renderBrief(loading) {
   document.getElementById("pHead").textContent = b.headline;
   document.getElementById("pPrios").innerHTML = b.items.slice(0, 3).map((it, i) => prioHTML(it, i, true)).join("");
   renderPush();
+  const st0 = state.snap && state.snap.student;
+  const worry = state.snap && (state.snap.holds.length || state.snap.early_alerts.length);
+  setBot(loading ? "thinking" : worry ? "alert" : "happy",
+    loading ? "Checking your 5 systems…" : worry ? `Heads up, ${st0.first_name}!` : `Morning, ${st0 ? st0.first_name : ""}!`);
   const pill = document.getElementById("aiPill");
   pill.className = "pill mono " + (state.engine === "scripted" ? "fb" : "ai") + (loading ? " busy" : "");
   document.getElementById("aiText").textContent = loading ? "AI brief: generating…" :
@@ -764,7 +803,7 @@ function testStart() {
   };
 }
 function testIntro() {
-  tv().innerHTML = `<div class="tcard"><div class="eyebrow">Thanks for helping</div><h1 style="font-size:28px">Try ACE for about 5 minutes</h1>
+  tv().innerHTML = `<div class="tcard"><img src="assets/ace-wink.gif" alt="ACE, the assistant character, winking" width="90" height="99" style="float:right;margin:-8px -6px 0 10px"><div class="eyebrow">Thanks for helping</div><h1 style="font-size:28px">Try ACE for about 5 minutes</h1>
     <p>ACE is a class prototype for Kent State. You'll look at a pretend student's information two ways and answer a few quick questions. We time how long each answer takes.</p>
     <ul><li>All student information is made up.</li><li>We don't collect your name or email.</li><li>We're testing the design, not you. If something is hard to find, that's useful to know.</li></ul>
     <p>You can stop at any time.</p><button class="btn primary" id="tOk">I'm ready</button></div>`;
@@ -867,7 +906,7 @@ async function testSubmit() {
   try { await sqlCall("submit", payload); } catch (e) { saved = false; console.warn(e); try { localStorage.setItem("ace_unsent_" + Date.now(), JSON.stringify(payload)); } catch (_) {} }
   const avg = c => { const t = T.tasks.filter(x => x.condition === c); return t.length ? (t.reduce((a, x) => a + x.seconds, 0) / t.length).toFixed(1) : "–"; };
   const right = c => T.tasks.filter(x => x.condition === c && x.correct).length;
-  tv().innerHTML = `<div class="tcard"><div class="eyebrow">${saved ? "Saved" : "Not saved"}</div><h1 style="font-size:28px">Thank you!</h1>
+  tv().innerHTML = `<div class="tcard"><img src="assets/ace-done.gif" alt="ACE, the assistant character, with a check mark" width="100" height="110" style="float:right;margin:-8px -6px 0 10px"><div class="eyebrow">${saved ? "Saved" : "Not saved"}</div><h1 style="font-size:28px">Thank you!</h1>
     <table class="tt"><tr><th></th><th>Current way</th><th>With ACE</th></tr>
       <tr><td>Average time per question</td><td>${avg("baseline")} s</td><td>${avg("ace")} s</td></tr>
       <tr><td>Correct answers</td><td>${right("baseline")} of 3</td><td>${right("ace")} of 3</td></tr></table>
@@ -1028,7 +1067,8 @@ async function init() {
   // tabs
   const tabs = [...document.querySelectorAll('[role=tab]')];
   tabs.forEach((t, i) => {
-    t.onclick = () => { tabs.forEach(x => { x.setAttribute("aria-selected", x === t); document.getElementById(x.getAttribute("aria-controls")).hidden = x !== t; }); };
+    t.onclick = () => { tabs.forEach(x => { x.setAttribute("aria-selected", x === t); document.getElementById(x.getAttribute("aria-controls")).hidden = x !== t; });
+      document.getElementById("demobar").hidden = ["t-adv", "t-test", "t-results"].includes(t.id); };
     t.onkeydown = e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click(); } };
   });
   document.getElementById("t-adv").addEventListener("click", () => { if (!document.getElementById("advView").innerHTML) advInit(); });
@@ -1053,9 +1093,12 @@ async function init() {
   try {
     state.personas = await q("personas");
   } catch (e) { state.personas = []; }
-  const sel = document.getElementById("personaSel");
-  sel.innerHTML = state.personas.map(p => `<option value="${p.id}">${h(p.persona_label)}</option>`).join("");
-  sel.onchange = () => loadStudent(sel.value);
+  const chips = document.getElementById("personaChips");
+  chips.innerHTML = state.personas.map((p, i) => `<button type="button" class="pchip" data-pid="${p.id}" aria-pressed="${i === 0}"><b>${h(p.first_name)}</b><small>${h((p.persona_label || "").split("·").pop().trim())}</small></button>`).join("");
+  chips.querySelectorAll(".pchip").forEach(b => b.onclick = () => {
+    chips.querySelectorAll(".pchip").forEach(x => x.setAttribute("aria-pressed", x === b));
+    loadStudent(b.dataset.pid);
+  });
   if (state.personas.length) loadStudent(state.personas[0].id);
   else loadStudent("none");
 }

@@ -2,12 +2,14 @@
 
 ACE (Academic & Career Executive assistant) is a class prototype for EMAT 60010 at Kent State University, by Sam Garcia, Allan Sanchez, Abisola Mohammed and Rami Daud. **All student data is synthetic.** It is not an official Kent State product.
 
-**Live demo:** https://ramidaud.github.io/ace-prototype/
-**Tester link (test mode only):** https://ramidaud.github.io/ace-prototype/#test
+**Project site (hub):** https://ramidaud.github.io/ace-prototype/
+**Prototype:** https://ramidaud.github.io/ace-prototype/prototype/
+**Tester link (test mode only):** https://ramidaud.github.io/ace-prototype/prototype/#test (the old root `#test` link forwards here)
+**Design system:** https://ramidaud.github.io/ace-prototype/design/
 
 ## What's here
 
-- `index.html` is the whole prototype in one file. It reads a Supabase database (read-only, synthetic data) and gets the daily brief from Google Gemini through a Supabase Edge Function.
+- `index.html` is the project hub site. `prototype/index.html` is the whole prototype in one file. It reads a Supabase database (read-only, synthetic data) and gets the daily brief from Google Gemini through a Supabase Edge Function.
 - `tools/seed_personas.py` generated the five demo students.
 
 ## Views

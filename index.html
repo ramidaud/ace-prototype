@@ -271,7 +271,7 @@ footer .wrap{display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap;
   .kent{padding:32px}.flow{padding:24px}
   .compare td:nth-child(2){display:none}.compare th:nth-child(2){display:none}
   .ev-bars .row{grid-template-columns:1fr 56px}.ev-bars .row span{grid-column:1/-1}
-  .hero-orb{top:14%;width:110px}.hero-bubble{display:none}
+  .hero-orb{top:76px;right:20px;width:64px}.hero-bubble{display:none}
   .dl a,.dl div.row{grid-template-columns:1fr auto}.dl .mono{display:none}
 }
 @media (prefers-reduced-motion:reduce){
@@ -386,8 +386,8 @@ footer .wrap{display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap;
       </ol>
     </div>
     <div class="device reveal">
-      <div class="laptop"><img src="assets/shots/dashboard.png" alt="The ACE panel in FlashLine showing three priorities for Jordan: a paper due tonight, study help, and planning ahead" width="1600" height="1000" loading="lazy"></div>
-      <div class="phone"><img src="assets/shots/phone.png" alt="ACE on a phone, opened from a KSUMobile notification" width="390" height="844" loading="lazy"></div>
+      <div class="laptop"><img src="assets/shots/dashboard.png" alt="The ACE panel in FlashLine showing three priorities for Jordan: a paper due tonight, study help, and planning ahead" width="1432" height="760" loading="lazy"></div>
+      <div class="phone"><img src="assets/shots/phone.png" alt="ACE on a phone, opened from a KSUMobile notification" width="335" height="746" loading="lazy"></div>
     </div>
   </div>
 
@@ -431,7 +431,7 @@ footer .wrap{display:flex;gap:24px;justify-content:space-between;flex-wrap:wrap;
       <a class="btn primary" href="prototype/">Open the prototype →</a>
       <p class="src" style="margin-top:18px">All student data is synthetic. Production would use Microsoft Copilot; the prototype uses a demo model.</p>
     </div>
-    <a class="shot reveal" href="prototype/" aria-label="Open the prototype"><img src="assets/shots/advisor.png" alt="ACE advisor view listing advisees sorted by who needs attention, with a prep sheet for Tyler" width="1600" height="1000" loading="lazy"></a>
+    <a class="shot reveal" href="prototype/" aria-label="Open the prototype"><img src="assets/shots/advisor.png" alt="ACE advisor view listing advisees sorted by who needs attention, with a prep sheet for Tyler" width="1182" height="699" loading="lazy"></a>
   </div>
 </div></section>
 
@@ -640,7 +640,7 @@ fetch("https://gcwuhdofhlebpgaqaran.supabase.co/rest/v1/rpc/ace_test_progress", 
   const n = v.sessions || 0;
   document.getElementById("sessions").textContent = n;
   document.querySelectorAll("#bar8 i").forEach((i, k) => i.classList.toggle("on", k < n));
-}).catch(() => { document.getElementById("sessions").textContent = "In progress"; });
+}).catch(() => {});
 </script>
 </body>
 </html>

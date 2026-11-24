@@ -81,7 +81,9 @@ Kent State primary colors are blue (PMS 281, `#003976`) and gold (PMS 124, `#EFA
 
 Adobe Fonts licenses Tablet Gothic for website publishing and for video, so the same font works on the site, in DaVinci and in slides.
 
-**Setup (Rami, once):** fonts.adobe.com → Tablet Gothic → "Add to Web Project" → name it `ace-site` → also add Tablet Gothic Wide and Museo Slab → copy the embed link (`https://use.typekit.net/XXXXXXX.css`) and paste it to Claude. For DaVinci/slides, also click "Activate" so the desktop fonts sync.
+**Web project:** `<link rel="stylesheet" href="https://use.typekit.net/huk6nbo.css">` (Rami's Adobe Fonts project). Family names: `tablet-gothic`, `tablet-gothic-wide`, `tablet-gothic-narrow`, `tablet-gothic-condensed`, `museo-slab`. For DaVinci and slides, click "Activate" on each family in Adobe Fonts so the desktop fonts sync.
+
+**Weights in the web project right now: 400 and 700 only.** Until Light (300) is added, the signature headline uses Regular 400 for the first line.
 
 CSS stack:
 

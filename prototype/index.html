@@ -4,15 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ACE Prototype · FlashLine</title>
-<link rel="stylesheet" href="https://use.typekit.net/huk6nbo.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#14161b; --side:#111318; --panel:#1d2027; --panel2:#23262e; --line:#2c3039;
-  --text:#f3f4f6; --muted:#a3a9b5; --dim:#7d8390;
+  --bg:#26262d; --side:#2c2c33; --panel:#1e1e24; --panel2:#2a2a31; --line:#3a3a43;
+  --text:#f2f2f4; --muted:#b9b9c1; --dim:#8a8a93; --fl-purple:#5b2bb0; --fl-active:#3b3b44;
   --blue:#6b9bff; --gold:#f5b400; --orange:#ffb366; --red:#ff7a7a; --green:#5fd39a;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; --sans:"tablet-gothic",Inter,system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --r:14px;
 }
 *{box-sizing:border-box}
@@ -25,34 +24,105 @@ a{color:var(--blue)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .mono{font-family:var(--mono);font-size:12px;letter-spacing:.02em}
 
-/* shell */
-.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
-aside{background:var(--side);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:6px}
-.brand{font-weight:800;font-size:22px;letter-spacing:-.02em;padding:0 10px}
-.brand small{display:block;font:500 10px var(--mono);color:var(--muted);letter-spacing:.08em;margin-top:2px}
-.who{display:flex;gap:10px;align-items:center;padding:16px 10px 12px}
-.avatar{width:40px;height:40px;border-radius:50%;background:#2c3039;display:grid;place-items:center;font-weight:700;color:var(--gold)}
-.who b{display:block;font-size:14px}.who span{font-size:12px;color:var(--muted)}
-nav a{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;color:var(--text);text-decoration:none;font-size:15px}
-nav a:hover{background:#1b1e24}
-nav a[aria-current]{border:1px solid var(--gold);background:#1c1a12;font-weight:700}
-nav a[aria-current]::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--gold)}
-.navsep{border-top:1px solid var(--line);margin:8px 0}
+/* prototype bar (NOT part of FlashLine) */
+.protobar{background:repeating-linear-gradient(135deg,#17140a 0 14px,#1b180d 14px 28px);border-bottom:2px solid #6b5a14;padding:10px 20px 0;color:#f2e6bf}
+.pb-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pb-tag{font:600 11px var(--mono);letter-spacing:.1em;color:#1b180d;background:var(--gold);padding:4px 8px;border-radius:4px;white-space:nowrap}
+.protobar .pchips{margin:0;flex:1;min-width:0}
+.protobar #personaStory{margin:8px 0 0;font-size:13px;color:#d9cfa8}
+.protobar .tabs{padding:10px 0 10px;gap:6px}
+.protobar .tabs button{border-color:#5a4c1c;color:#e9dcae;background:rgba(0,0,0,.25)}
+.protobar .tabs button[aria-selected=true]{background:var(--gold);border-color:var(--gold);color:#1b180d}
+.pb-label{font:500 10px var(--mono);letter-spacing:.1em;color:#bfae6e;margin-right:4px;align-self:center}
+body.bare .app aside,body.bare .fl-top{display:none}
+body.bare .app{grid-template-columns:1fr}
+/* FlashLine shell */
+.app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+aside{background:var(--side);border-right:1px solid #232329;padding:26px 22px;display:flex;flex-direction:column;align-items:stretch;gap:4px}
+.fl-logo{font:italic 800 30px/1 var(--sans);letter-spacing:.01em;text-align:center;margin-bottom:26px}
+.fl-logo i{font-weight:400}
+.fl-me{text-align:center;margin-bottom:14px}
+.avatar{width:96px;height:96px;margin:0 auto 12px;border-radius:50%;background:linear-gradient(135deg,#2f7fe0,#7a5cf0 55%,#e070b8);display:grid;place-items:center;font:700 38px var(--sans);color:#fff;box-shadow:0 0 0 4px var(--side)}
+.fl-me b{display:block;font-size:19px}.fl-me span{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+.fl-btn{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px auto 0;width:190px;background:none;border:1px solid #55555e;border-radius:6px;padding:9px 12px;color:var(--text);font-size:14px}
+aside nav{margin-top:24px}
+nav a{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:8px;color:var(--text);text-decoration:none;font-size:15px}
+nav a svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;opacity:.85}
+nav a:hover{background:#34343c}
+nav a[aria-current]{background:var(--fl-active);font-weight:700}
+.navsep{border-top:1px solid #45454e;margin:14px 0}
+.fl-kent{margin-top:auto;text-align:center;font:400 22px/1 Georgia,"Times New Roman",serif;letter-spacing:.04em;color:#d8d8dc;padding-top:24px}
+.fl-kent small{display:block;font-size:9px;letter-spacing:.5em;margin-top:4px}
 .persona{margin-top:auto;padding:12px 10px;border:1px dashed #3a3f4a;border-radius:12px}
 .persona label{display:block;font:500 10px var(--mono);letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
 .persona select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px}
 .persona p{font-size:12px;color:var(--muted);margin:8px 0 0}
 
 main{min-width:0}
-.top{display:flex;align-items:center;gap:16px;padding:14px 28px;border-bottom:1px solid var(--line)}
-.search{flex:1;color:var(--muted);font-size:15px}
-.crumb{color:var(--muted)}.crumb b{color:var(--blue);font-weight:500}
+.fl-top{display:flex;align-items:center;gap:14px;padding:12px 28px;border-bottom:1px solid #303038;background:var(--bg)}
+.search{flex:1;color:var(--muted);font-size:16px;display:flex;align-items:center;gap:10px}
+.search svg,.fl-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6}
+.fl-pill{display:flex;align-items:center;gap:8px;border:1px solid #4a4a53;border-radius:6px;padding:8px 14px;font-size:14px;color:var(--text);background:none}
+.fl-icon{position:relative;color:var(--muted);padding:4px}
+.fl-icon i{position:absolute;top:-4px;right:-8px;background:#7c4dff;color:#fff;font:700 10px var(--sans);border-radius:999px;padding:2px 5px;font-style:normal}
+.fl-page{padding:26px 40px 0}
+.fl-title{font:300 40px/1.15 var(--sans);letter-spacing:-.01em;margin:0 0 18px;max-width:none}
+.fl-tabs{display:flex;gap:34px;border-bottom:1px solid #4a4a53;flex-wrap:wrap}
+.fl-tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:0 0 12px;font-size:17px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:8px}
+.fl-tabs button[aria-selected=true]{color:var(--text);border-bottom-color:var(--text)}
+.fl-tabs .new{font:700 10px var(--sans);letter-spacing:.06em;background:var(--gold);color:#1b180d;border-radius:4px;padding:2px 6px}
 .tabs{display:flex;gap:6px;padding:14px 28px 0;flex-wrap:wrap}
 .tabs button{background:none;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--muted);cursor:pointer}
 .tabs button[aria-selected=true]{background:var(--text);color:#111;border-color:var(--text);font-weight:600}
-.view{padding:18px 28px 40px}
+.view{padding:18px 40px 40px}
+#v-dash{padding:0 0 40px}
+.flpanel{padding:24px 40px 0}
 [hidden]{display:none!important}
 
+/* FlashLine home (Student Dashboard) */
+.fl-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin:26px 0}
+.fl-stats div{border-bottom:1px solid #4a4a53;padding-bottom:16px}
+.fl-stats b{display:block;font:600 34px var(--sans)}
+.fl-stats span{display:block;font-size:19px;color:var(--text);margin-top:2px}
+.fl-stats a{display:block;margin-top:18px;color:var(--text);text-decoration:none;font-size:15px}
+.fl-grid{display:grid;grid-template-columns:minmax(260px,.9fr) 1.6fr;gap:22px;align-items:start}
+.fl-card{background:var(--panel);border-radius:6px;overflow:hidden}
+.fl-card h3{margin:0;padding:18px 22px;font:400 24px var(--sans);border-bottom:1px solid #34343c}
+.fl-prof{padding:22px;text-align:center}
+.fl-prof .avatar{width:120px;height:120px;font-size:46px}
+.fl-prof b{display:block;font-size:22px;margin-top:6px}
+.fl-prof p{color:var(--muted);margin:6px 0 0}
+.fl-prof dl{text-align:left;margin:20px 0 0}
+.fl-prof dt{font-weight:700;display:inline}.fl-prof dd{display:inline;margin:0 0 0 6px}
+.fl-prof div.r{margin:6px 0}
+.fl-tiles{display:grid;grid-template-columns:repeat(5,1fr)}
+.fl-tiles div{padding:26px 12px;text-align:center;border-right:1px solid #34343c;font-size:15px}
+.fl-tiles div:last-child{border-right:0}
+.fl-tiles svg{width:38px;height:38px;stroke:#d9d9de;fill:none;stroke-width:1.4;display:block;margin:0 auto 12px}
+.fl-reg h3{background:var(--fl-purple);border:0}
+.fl-reg .body{display:grid;grid-template-columns:1fr 1fr;min-height:220px}
+.fl-reg .circle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px;text-align:center}
+.fl-reg .circle b.term{font-size:20px}
+.fl-reg .circle span.num{width:110px;height:110px;border-radius:50%;border:4px solid #4a4a53;display:grid;place-items:center;font:600 44px var(--sans)}
+.fl-reg .acts{display:grid;grid-template-columns:1fr 1fr;background:var(--panel2)}
+.fl-reg .acts div{display:grid;place-items:center;text-align:center;padding:16px;border:1px solid #232329;font-size:14px}
+/* ACE card on the Student Dashboard */
+.ace-card{background:linear-gradient(135deg,#1b2a4a,#1e1e24 60%);border:1px solid #39507f;border-radius:6px;padding:22px 24px;margin-top:24px;position:relative}
+.ace-card .hd{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ace-card .hd img{width:62px;height:auto}
+.ace-card .hd .t{flex:1;min-width:240px}
+.ace-card .hd .mono{color:var(--gold);letter-spacing:.08em}
+.ace-card .hd h2{margin:4px 0 0;font:600 24px/1.2 var(--sans)}
+.ace-card ol{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ace-card li{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:14px 16px}
+.ace-card li.first{border-color:var(--gold)}
+.ace-card li .mono{color:#9db8f5;font-size:11px;text-transform:uppercase}
+.ace-card li.first .mono{color:var(--gold)}
+.ace-card li b{display:block;margin:6px 0 4px;font-size:16px;line-height:1.3}
+.ace-card li span{font-size:13px;color:var(--muted)}
+#p-ace #headline{font-weight:600;letter-spacing:-.01em}
+.ace-open{background:var(--gold);color:#1b180d;border:0;border-radius:6px;padding:10px 16px;font:700 14px var(--sans);cursor:pointer}
+.ace-card .ft{margin-top:14px;font-size:12px;color:var(--dim)}
 /* header */
 .eyebrow{font:500 13px var(--mono);color:var(--blue);letter-spacing:.04em;text-transform:uppercase}
 .headrow{display:flex;align-items:flex-start;gap:16px;justify-content:space-between;margin:6px 0 18px;flex-wrap:wrap}
@@ -266,46 +336,114 @@ body.testing .app{grid-template-columns:1fr}
   .bubble::after{left:-5px;top:50%;bottom:auto;margin:-5px 0 0;border:5px solid transparent;border-left:0;border-right-color:var(--text)}
   .advprep{position:static}
   .more summary .mono{display:none}
+  /* FlashLine shell on phones: compact header row */
+  aside{flex-direction:row;align-items:center;justify-content:space-between;padding:12px 16px}
+  .fl-logo{font-size:22px;margin:0}
+  .fl-me{display:flex;align-items:center;gap:10px;margin:0;text-align:left}
+  .fl-me .avatar{width:36px;height:36px;font-size:16px;margin:0;box-shadow:none}
+  .fl-me b{font-size:14px}.fl-me span,.fl-btn,.fl-kent{display:none}
+  .fl-top{padding:10px 16px}.fl-pill,.fl-icon{display:none}
+  .fl-page,.flpanel{padding-left:16px;padding-right:16px}
+  #v-dash{padding:0 0 30px}
+  .fl-title{font-size:30px}
+  .fl-tabs{gap:22px;flex-wrap:nowrap;overflow-x:auto}
+  .fl-tabs button{white-space:nowrap;font-size:16px}
+  .fl-stats,.fl-grid,.ace-card ol,.fl-reg .body{grid-template-columns:1fr}
+  .fl-tiles{grid-template-columns:repeat(3,1fr)}
+  .fl-tiles div{border-bottom:1px solid #34343c}
+  .protobar{padding:10px 16px 0}
+  .protobar .pchips{flex:1 1 100%}
+  .protobar .tabs{flex-wrap:nowrap;overflow-x:auto;padding-left:0;padding-right:0}
+  .protobar .tabs button{white-space:nowrap}
+  .ace-card .hd .t{min-width:0;flex:1 1 calc(100% - 80px)}
+  .ace-card .hd img{width:48px}.ace-card .hd h2{font-size:20px}
+  .ace-open{width:100%}
+  .protobar .pchips{flex-wrap:nowrap;overflow-x:auto}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 <a class="skip" href="#ace-main">Skip to ACE</a>
+<!-- PROTOTYPE BAR: demo controls, not part of FlashLine -->
+<div class="protobar" id="protobar" role="region" aria-label="Prototype controls">
+  <div class="pb-row" id="personaRow">
+    <span class="pb-tag">ACE PROTOTYPE · SYNTHETIC DATA</span>
+    <span class="pb-label">VIEWING AS</span>
+    <div class="pchips" id="personaChips"></div>
+  </div>
+  <p id="personaStory" aria-live="polite"></p>
+  <div class="tabs" role="tablist" aria-label="Prototype views">
+    <span class="pb-label">SHOW</span>
+    <button role="tab" aria-selected="true" aria-controls="v-dash" id="t-dash">In FlashLine</button>
+    <button role="tab" aria-selected="false" aria-controls="v-phone" id="t-phone">Phone</button>
+    <button role="tab" aria-selected="false" aria-controls="v-mail" id="t-mail">Email backup</button>
+    <button role="tab" aria-selected="false" aria-controls="v-trust" id="t-trust">How ACE handles data</button>
+    <button role="tab" aria-selected="false" aria-controls="v-adv" id="t-adv">Advisor view</button>
+    <button role="tab" aria-selected="false" aria-controls="v-test" id="t-test">Test mode</button>
+    <button role="tab" aria-selected="false" aria-controls="v-results" id="t-results">Results</button>
+  </div>
+</div>
 <div class="app">
   <aside aria-label="FlashLine navigation">
-    <div class="brand">Flashline<small>ACE PROTOTYPE</small></div>
-    <div class="who"><div class="avatar" id="avatar" aria-hidden="true">·</div><div><b id="whoName">Loading…</b><span id="whoSub">Sample student</span></div></div>
+    <div class="fl-logo">FLASH<i>line</i></div>
+    <div class="fl-me"><div class="avatar" id="avatar" aria-hidden="true">·</div><b id="whoName">Loading…</b><span id="whoSub">Sample student</span></div>
+    <button class="fl-btn" type="button" tabindex="-1">☆ My Dashboard</button>
+    <button class="fl-btn" type="button" tabindex="-1">⚡ FLASH Insights</button>
     <nav>
-      <a href="#ace" onclick="return false">Welcome</a>
-      <a href="#ace" onclick="return false">Student</a>
-      <a href="#ace" aria-current="page">ACE</a>
-      <a href="#ace" onclick="return false">Employee</a>
-      <a href="#ace" onclick="return false">University Resources</a>
+      <a href="#ace" onclick="return false"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 9h18"/></svg>Welcome</a>
+      <a href="#ace" aria-current="page"><svg viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg>Student</a>
+      <a href="#ace" onclick="return false"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><circle cx="9" cy="11" r="2"/><path d="M6 16c1-2 5-2 6 0M14 10h4M14 13h4"/></svg>Employee</a>
+      <a href="#ace" onclick="return false"><svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/></svg>University Resources</a>
       <div class="navsep"></div>
-      <a href="#ace" onclick="return false">Settings</a>
+      <a href="#ace" onclick="return false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>Settings</a>
+      <a href="#ace" onclick="return false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6M12 17h.01"/></svg>Help / Feedback</a>
     </nav>
+    <div class="fl-kent">KENT STATE<small>UNIVERSITY</small></div>
   </aside>
 
   <main id="ace-main" tabindex="-1">
-    <div class="top"><div class="search">Search Flashline…</div><div class="crumb mono">flashline / student / <b>ace</b></div></div>
-    <div class="demobar" id="demobar" role="group" aria-labelledby="demoLab">
-      <div class="demohead"><span id="demoLab" class="mono">VIEWING AS A DEMO STUDENT (SYNTHETIC)</span><span class="mono demohint">switch to see how ACE changes</span></div>
-      <div class="pchips" id="personaChips"></div>
-      <p id="personaStory" aria-live="polite"></p>
-    </div>
-    <div class="tabs" role="tablist" aria-label="Prototype views">
-      <button role="tab" aria-selected="true" aria-controls="v-dash" id="t-dash">Dashboard</button>
-      <button role="tab" aria-selected="false" aria-controls="v-phone" id="t-phone">Phone</button>
-      <button role="tab" aria-selected="false" aria-controls="v-mail" id="t-mail">Email backup</button>
-      <button role="tab" aria-selected="false" aria-controls="v-trust" id="t-trust">How ACE handles data</button>
-      <button role="tab" aria-selected="false" aria-controls="v-adv" id="t-adv">Advisor view</button>
-      <button role="tab" aria-selected="false" aria-controls="v-test" id="t-test">Test mode</button>
-      <button role="tab" aria-selected="false" aria-controls="v-results" id="t-results">Results</button>
+    <div class="fl-top">
+      <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5"/></svg>Search FlashLine...</div>
+      <span class="fl-pill">Events Calendar</span><span class="fl-pill">My Lists</span>
+      <span class="fl-icon"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><i>1</i></span>
+      <span class="fl-icon"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="1.5"/><path d="M3 7l9 7 9-7"/></svg><i>12</i></span>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- IN FLASHLINE: Student Dashboard with an ACE tab -->
     <section class="view" id="v-dash" role="tabpanel" aria-labelledby="t-dash">
+      <div class="fl-page">
+        <h1 class="fl-title">Student Dashboard</h1>
+        <div class="fl-tabs" role="tablist" aria-label="Student Dashboard">
+          <button role="tab" data-fl="p-home" aria-selected="true" id="fl-home">Dashboard</button>
+          <button role="tab" data-fl="p-ace" aria-selected="false" id="fl-ace">ACE <span class="new">NEW</span></button>
+          <button role="tab" data-fl="none" aria-selected="false" tabindex="-1">Finances ▾</button>
+          <button role="tab" data-fl="none" aria-selected="false" tabindex="-1">Resources ▾</button>
+          <button role="tab" data-fl="none" aria-selected="false" tabindex="-1">Career Exploration &amp; Development</button>
+        </div>
+      </div>
+
+      <!-- Dashboard tab: FlashLine as it is today, plus the ACE card -->
+      <div class="flpanel" id="p-home">
+        <div class="ace-card" id="homeAce" aria-live="polite"></div>
+        <div class="fl-stats" id="homeStats"></div>
+        <div class="fl-grid">
+          <div class="fl-card"><h3>Profile</h3><div class="fl-prof" id="homeProfile"></div></div>
+          <div style="display:grid;gap:22px">
+            <div class="fl-card fl-tiles">
+              <div><svg viewBox="0 0 40 40"><circle cx="20" cy="12" r="5"/><path d="M12 34l8-14 8 14M10 22h20"/></svg>GPS Audit and Plan</div>
+              <div><svg viewBox="0 0 40 40"><path d="M6 26c6-10 22-10 28 0M10 26l2-6M16 26l1-8M24 26l-1-8M30 26l-2-6"/></svg>Student Profile</div>
+              <div><svg viewBox="0 0 40 40"><rect x="10" y="6" width="20" height="28" rx="2"/><path d="M14 13h12M14 18h12M14 23h8"/></svg>View Unofficial Transcript</div>
+              <div><svg viewBox="0 0 40 40"><circle cx="20" cy="17" r="9"/><path d="M20 12v10M17 14h5a2 2 0 0 1 0 4h-4a2 2 0 0 0 0 4h5M8 34h24"/></svg>Make Payments/ Payment Plan</div>
+              <div><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13"/><rect x="15" y="15" width="10" height="10" rx="1"/></svg>Financial Billing and Enrollment Center</div>
+            </div>
+            <div class="fl-card fl-reg"><h3>Course Registration</h3><div class="body" id="homeReg"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACE tab -->
+      <div class="flpanel" id="p-ace" hidden>
       <div class="eyebrow">ACE / Academic &amp; Career Executive Assistant</div>
       <div class="headrow">
         <div class="botwrap"><span class="bubble" id="botSay" aria-live="polite">Morning!</span><img id="botImg" class="bot" src="../assets/ace-hello.gif" alt="ACE, the assistant character" width="96" height="106"></div>
@@ -323,17 +461,18 @@ body.testing .app{grid-template-columns:1fr}
         <div class="card tile" id="tCareer"></div>
       </div>
       <details class="more" id="more">
-        <summary><span>Details</span><span class="mono">graduation · workload · coming up · degree requirements</span></summary>
+        <summary><span>Details</span><span class="mono">credits · workload · coming up · support</span></summary>
       <div class="grid2eq">
         <div class="card tile" id="tGrad"></div>
         <div class="card tile" id="tLoad"></div>
       </div>
       <div class="grid2">
         <div class="card"><div class="lab">Coming up</div><ul class="list" id="upcoming"></ul></div>
-        <div class="card"><div class="lab">Degree requirements</div><div class="req" id="reqs"></div>
-          <div class="foot" id="reqFoot">Based on your GPS audit. Check big decisions with your advisor.</div></div>
+        <div class="card"><div class="lab">Support for you</div><ul class="list" id="support"></ul>
+          <div class="foot" id="reqFoot">From KSU Navigate. For degree decisions, talk with your advisor.</div></div>
       </div>
       </details>
+      </div>
     </section>
 
     <!-- PHONE -->
@@ -456,7 +595,7 @@ async function q(kind, arg) {
 }
 
 /* ===================== AI brief ===================== */
-const FIELDS_SENT = ["first_name","class_level","major","minor","campus","expected_grad_term","credits_earned","credits_in_progress","credits_required","first_generation","college_credit_plus","transfer","advisor_name","courses","upcoming","recent_grades","gps_audit","registration","holds","key_dates","spring_sections_for_open_core","support_services","early_alerts","career_events","jobs"];
+const FIELDS_SENT = ["first_name","class_level","major","minor","campus","expected_grad_term","credits_earned","credits_in_progress","credits_required","first_generation","college_credit_plus","transfer","advisor_name","courses","upcoming","recent_grades","registration","holds","key_dates","support_services","early_alerts","career_events","jobs"];
 const FIELDS_KEPT = ["banner_id","last_name","email","advisor_email","gpa","student id"];
 function minimize(s) {
   const st = s.student || {}; const pick = {};
@@ -473,7 +612,7 @@ function minimize(s) {
 }
 function prompt(data) {
   return `You are ACE, the Academic & Career Executive assistant inside Kent State University's FlashLine portal.
-Today is ${data.today}. Below is one student's data, read (never changed) from Canvas, the GPS degree audit, Visual Schedule Builder, Navigate360, Handshake and FlashLine holds. Write this student's morning brief.
+Today is ${data.today}. Below is one student's data, read (never changed) from Canvas, Banner (registration, holds and credits), Visual Schedule Builder, KSU Navigate and Handshake. Write this student's morning brief.
 
 Rules:
 - Choose the 3 most important things, ranked by urgency and consequence: work due today or overdue, anything blocking registration or graduation, falling grades, then opportunities.
@@ -569,7 +708,7 @@ function renderBrief(loading) {
   P.innerHTML = b.items.slice(0, 3).map((it, i) => prioHTML(it, i)).join("");
   document.getElementById("pHead").textContent = b.headline;
   document.getElementById("pPrios").innerHTML = b.items.slice(0, 3).map((it, i) => prioHTML(it, i, true)).join("");
-  renderPush();
+  renderPush(); renderHomeAce();
   const st0 = state.snap && state.snap.student;
   const worry = state.snap && (state.snap.holds.length || state.snap.early_alerts.length);
   setBot(loading ? "thinking" : worry ? "alert" : "happy",
@@ -577,7 +716,7 @@ function renderBrief(loading) {
   const pill = document.getElementById("aiPill");
   pill.className = "pill mono " + (state.engine === "scripted" ? "fb" : "ai") + (loading ? " busy" : "");
   document.getElementById("aiText").textContent = loading ? "AI brief: generating…" :
-    state.engine === "scripted" ? "brief: stored copy" : `AI brief · ${state.engine}`;
+    state.engine === "scripted" ? "brief: stored copy" : "AI brief · live";
 }
 function renderTiles(s) {
   const st = s.student;
@@ -621,14 +760,8 @@ function renderTiles(s) {
 function renderLists(s) {
   document.getElementById("upcoming").innerHTML = s.upcoming.slice(0, 7).map(u =>
     `<li><span>${h(u.title)} · ${h(u.course)}</span><span>${dueLabel(u)}</span></li>`).join("") || "<li><span>Nothing due in the next three weeks</span><span></span></li>";
-  const blocks = {};
-  s.gps_audit.forEach(g => { const b = blocks[g.block] ||= { req: 0, done: 0, ip: 0 }; b.req += g.required; b.done += g.completed; b.ip += g.in_progress; });
-  document.getElementById("reqs").innerHTML = Object.entries(blocks).map(([k, b]) => {
-    const d = Math.min(100, 100 * b.done / b.req), ip = Math.min(100 - d, 100 * b.ip / b.req);
-    return `<div class="row"><span>${h(k)}</span><span>${b.done} / ${b.req}</span></div>
-      <div class="track" role="img" aria-label="${h(k)}: ${b.done} of ${b.req} credits complete, ${b.ip} in progress"><i style="width:${d}%"></i><u style="width:${ip}%"></u></div>`;
-  }).join("");
-  document.getElementById("reqFoot").textContent = `Based on your GPS audit. Darker blue is in progress this term. Check big decisions with ${s.student.advisor_name || "your advisor"}.`;
+  document.getElementById("support").innerHTML = (s.support_services || []).map(x =>
+    `<li><span>${h(x.name)}</span><span>${h(x.hours)}</span></li>`).join("") || "<li><span>No services listed</span><span></span></li>";
   // holds banner
   document.getElementById("holdBox").innerHTML = s.holds.map(x =>
     `<div class="alert" role="status"><b>Hold</b><span>${h(x.description)}. Fix it through: ${h(x.resolve_at)}.</span></div>`).join("") +
@@ -640,11 +773,11 @@ function renderSync(s) {
   document.getElementById("syncText").textContent = `synced ${t} · ${s.sync.length} sources`;
   document.getElementById("flow").innerHTML = [
     ["Canvas", "Courses, assignments, due dates, grades"],
-    ["GPS audit", "Degree requirements and credits"],
-    ["Schedule Builder", "Open Spring sections that fit"],
-    ["Navigate360", "Tutoring, advising, instructor alerts"],
+    ["Banner", "Registration windows, holds, credits"],
+    ["Schedule Builder", "Class times and open sections"],
+    ["KSU Navigate", "Tutoring, advising, instructor alerts"],
     ["Handshake", "Career events and job deadlines"]].map(([n, d]) => {
-      const row = s.sync.find(x => x.source === n);
+      const row = s.sync.find(x => x.source === n || (n === "Banner" && x.source === "GPS audit") || (n === "KSU Navigate" && x.source === "Navigate360"));
       return `<div class="card"><h3>${n}</h3><p>${d}</p><p class="mono" style="margin-top:6px">read-only · ${row ? row.records + " records · " + new Date(row.synced_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) : ""}</p></div>`;
     }).join("");
   document.getElementById("fields").innerHTML = FIELDS_SENT.map(f => `<code>${f}</code>`).join("") + FIELDS_KEPT.map(f => `<code class="out" title="Not sent to the AI">${f}</code>`).join("");
@@ -652,12 +785,14 @@ function renderSync(s) {
     ["ok", "Single sign-on, no new account", "Opens from a FlashLine tile or a KSUMobile notification with the student's existing Kent login (Entra ID, OIDC)."],
     ["ok", "Read-only access", "ACE reads source systems and links back. It never writes to Canvas, Banner or Navigate360."],
     ["ok", "Data minimization", "Names beyond first name, IDs, emails and GPA are not sent to the AI model."],
-    ["ok", "Approved AI model", "Production targets Google Gemini, which already passed Kent's review. Inside claude.ai this preview runs the same prompt on Claude."],
+    ["ok", "Approved AI model", "Production uses Microsoft Copilot, the AI Kent approves for school systems. This prototype runs the same prompt on a demo model."],
+    ["ok", "AI off switch", "If the AI layer is turned off or fails, ACE falls back to a plain list of what's due, in date order. Try it: the stored brief loads when the live model can't."],
     ["ok", "Keyboard and screen reader basics", "Skip link, visible focus, labeled charts, live regions. Works without a mouse."],
     ["todo", "HECVAT (security and privacy questionnaire)", "Team is mapping questions against ACE's design. Required before any pilot."],
+    ["todo", "Hosting and logging on Kent's Azure", "Production runs in Kent's US-only Azure tenant, briefs purge after 24 hours, and logs route to Kent's existing Sentinel security monitoring."],
     ["todo", "VPAT (accessibility conformance report)", "Formal WCAG 2.1 AA testing still to do."],
     ["todo", "FERPA review and data-sharing terms", "Needs agreements with Instructure, EAB and Handshake for production feeds."],
-    ["todo", "Pilot scope", "Kent Campus first, connecting Canvas and the GPS audit; then Navigate360, Schedule Builder and Handshake."]
+    ["todo", "Pilot scope", "Kent Campus first, connecting Canvas and Banner/Schedule Builder; then KSU Navigate and Handshake."]
   ].map(([s, t, d]) => `<li><span class="${s}" aria-hidden="true">${s === "ok" ? "✓" : "○"}</span><div><b>${t}</b><span>${s === "ok" ? "In prototype. " : "Next step. "}${d}</span></div></li>`).join("");
 }
 function renderMail(s) {
@@ -668,13 +803,40 @@ function renderMail(s) {
     <pre>${h(n.body)}</pre><div class="ctaRow"><a class="cta" href="#ace" onclick="document.getElementById('t-dash').click();return false">Open ACE in FlashLine</a></div>`;
 
 }
+function openAce() { document.getElementById("t-dash").click(); document.getElementById("fl-ace").click(); scrollTo(0, 0); }
+function renderHome(s) {
+  const st = s.student, reg = s.registration;
+  const bursar = s.holds.some(x => x.kind === "bursar");
+  document.getElementById("homeStats").innerHTML = `
+    <div><b style="${bursar ? "color:#ff8a8a" : ""}">${bursar ? "$1,248.50" : "$0.00"}</b><span>Student Account Balance</span><a href="#ace" onclick="return false">Get My Account Balance</a></div>
+    <div><b>$42.15</b><span>FlashCash Balance</span><a href="#ace" onclick="return false">Manage your FlashCard</a></div>
+    <div><b>${st.gpa ?? "N/A"}</b><span>GPA</span><a href="#ace" onclick="return false">GPS - Graduation Planning System</a></div>`;
+  document.getElementById("homeProfile").innerHTML = `<div class="avatar" aria-hidden="true">${h(st.first_name[0])}</div>
+    <b>${h(st.first_name)} ${h(st.last_name)}</b><p>${h(st.email)} · ${h(st.banner_id)}</p>
+    <dl><div class="r"><dt>My Advisor</dt><dd>${h(st.advisor_name || "")}</dd></div>
+    <div class="r"><dt>Major</dt><dd>${h(st.major)}</dd></div><div class="r"><dt>Level</dt><dd>${h(st.class_level)}</dd></div>
+    <div class="r"><dt>Campus</dt><dd>${h(st.campus)}</dd></div></dl>`;
+  const open = reg && reg.days_until < 0;
+  document.getElementById("homeReg").innerHTML = `<div class="circle"><b class="term">Spring</b><span class="num">${open ? st.credits_in_progress : 0}</span>
+    <span style="color:var(--muted)">${reg ? (open ? "Registration for Spring is in progress." : `Registration for Spring opens in ${reg.days_until} days.`) : "No registration window yet."}</span></div>
+    <div class="acts"><div>Add/Drop Courses</div><div>Visual Schedule Builder</div><div>View My Registration Status</div><div>Printable Schedule &amp; Text Books</div></div>`;
+}
+function renderHomeAce() {
+  const b = state.brief, st = state.snap && state.snap.student;
+  if (!b || !st) return;
+  document.getElementById("homeAce").innerHTML = `<div class="hd"><img src="../assets/ace-happy.gif" alt="">
+      <div class="t"><span class="mono">ACE · TODAY'S BRIEF</span><h2>${h(b.headline)}</h2></div>
+      <button class="ace-open" type="button" onclick="openAce()">Open ACE →</button></div>
+    <ol>${b.items.slice(0, 3).map((it, i) => `<li class="${i ? "" : "first"}"><span class="mono">${String(i + 1).padStart(2, "0")} / ${h(it.label)}</span><b>${h(it.title)}</b><span>From ${h(it.source)}</span></li>`).join("")}</ol>
+    <div class="ft">Synced at 6:00 am from Canvas, Banner, Schedule Builder, KSU Navigate and Handshake. ACE only reads; it never changes your records.</div>`;
+}
 function renderAll() {
   const s = state.snap, st = s.student;
   document.getElementById("whoName").textContent = `${st.first_name} ${st.last_name[0]}.`;
   document.getElementById("whoSub").textContent = `${st.class_level} · ${st.major}`;
   document.getElementById("avatar").textContent = st.first_name[0];
   document.getElementById("personaStory").textContent = s.persona_story || "";
-  renderTiles(s); renderLists(s); renderSync(s); renderMail(s);
+  renderTiles(s); renderLists(s); renderSync(s); renderMail(s); renderHome(s);
 }
 
 function renderPush() {
@@ -1034,7 +1196,6 @@ async function advPrep(id) {
   const s = await q("snapshot", id), st = s.student;
   const overdue = s.upcoming.filter(u => u.days_until < 0);
   const low = [...s.courses].sort((a, b) => a.current_score - b.current_score).slice(0, 2);
-  const gaps = s.gps_audit.filter(g => g.status === "still_needed");
   const pts = [];
   s.holds.forEach(x => pts.push(`Resolve the ${(HOLD_NAMES[x.kind] || x.kind).toLowerCase()}${s.registration && s.registration.days_until >= 0 ? ` before registration opens in ${s.registration.days_until} days` : ""}. Fix: ${x.resolve_at}.`));
   s.early_alerts.forEach(a => pts.push(`Follow up on ${a.raised_by}'s concern in ${a.course}: ${a.reason.toLowerCase()}.`));
@@ -1045,7 +1206,7 @@ async function advPrep(id) {
     : s.support_services.find(x => x.kind === "tutoring");
   low.filter(c => c.current_score < 80).forEach(c => { const sv = helpFor(c);
     pts.push(`Check in on ${c.course} (${Math.round(c.current_score)}%).${sv ? ` Suggest ${sv.name} (${sv.hours}).` : ""}`); });
-  gaps.forEach(g => pts.push(g.block === "Transfer" ? `Confirm the transfer credit evaluation: ${g.requirement}.` : `Plan Spring courses for ${g.requirement} (${g.completed} of ${g.required} credits done).`));
+  if (st.transfer) pts.push("Transfer student: confirm the transfer credit evaluation is complete.");
   if (st.expected_grad_term === "May 2027") pts.push("Confirm the graduation application is filed.");
   if (st.first_generation) pts.push("First-generation student: make sure they know which support services exist.");
   if (st.college_credit_plus) pts.push("CCP student: review CCP-only deadlines with their high school counselor in mind.");
@@ -1059,17 +1220,21 @@ async function advPrep(id) {
     <ul class="list">${brief ? brief.items.map(i => `<li style="display:block"><b>${h(i.title)}</b><br><span style="color:var(--muted);font-size:14px">${h(i.detail)} · ${h(i.source)}</span></li>`).join("") : "<li>No brief</li>"}</ul>
     <div class="grid2eq">
       <div><h3 class="psec">Current grades</h3><ul class="list">${s.courses.map(c => `<li><span>${h(c.course)} ${h(c.title)}</span><span style="${c.current_score < 75 ? "color:var(--orange);font-weight:700" : ""}">${Math.round(c.current_score)}%</span></li>`).join("")}</ul></div>
-      <div><h3 class="psec">Degree progress</h3><ul class="list">${s.gps_audit.map(g => `<li><span>${h(g.requirement)}</span><span style="${g.status === "still_needed" ? "color:var(--orange);font-weight:700" : ""}">${g.completed}/${g.required}</span></li>`).join("")}</ul></div>
+      <div><h3 class="psec">Coming up</h3><ul class="list">${s.upcoming.slice(0, 6).map(u => `<li><span>${h(u.title)} · ${h(u.course)}</span><span>${dueLabel(u)}</span></li>`).join("") || "<li>Nothing due soon</li>"}</ul></div>
     </div>
     <p class="foot">Talking points come from fixed rules, not AI, so you can see why each one is here. Advisors see only their own advisees. All data on this page is synthetic.</p>`;
 }
 
 async function init() {
   // tabs
-  const tabs = [...document.querySelectorAll('[role=tab]')];
+  const tabs = [...document.querySelectorAll('.protobar [role=tab]')];
+  // FlashLine's own Student Dashboard tabs
+  const flTabs = [...document.querySelectorAll('.fl-tabs [role=tab][data-fl]')].filter(b => b.dataset.fl !== "none");
+  flTabs.forEach(b => b.onclick = () => { flTabs.forEach(x => { x.setAttribute("aria-selected", x === b); document.getElementById(x.dataset.fl).hidden = x !== b; }); });
   tabs.forEach((t, i) => {
     t.onclick = () => { tabs.forEach(x => { x.setAttribute("aria-selected", x === t); document.getElementById(x.getAttribute("aria-controls")).hidden = x !== t; });
-      document.getElementById("demobar").hidden = ["t-adv", "t-test", "t-results"].includes(t.id); };
+      document.getElementById("personaRow").hidden = document.getElementById("personaStory").hidden = ["t-adv", "t-test", "t-results"].includes(t.id);
+      document.body.classList.toggle("bare", ["t-phone", "t-mail", "t-test", "t-results"].includes(t.id)); };
     t.onkeydown = e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click(); } };
   });
   document.getElementById("t-adv").addEventListener("click", () => { if (!document.getElementById("advView").innerHTML) advInit(); });

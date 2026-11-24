@@ -281,3 +281,10 @@ Same palette, fonts and chart rules. Slides: navy-900 title slides, paper conten
 - [ ] No GPS audit or Gemini in final copy
 - [ ] Real Kent photos with releases
 - [ ] Works with keyboard only, and with reduced motion turned on
+
+## Update, Nov 23: prototype follows FlashLine, not the marketing system
+
+- The prototype now mirrors FlashLine's real dark UI: system sans, charcoal greys, the purple Course Registration header, "Student Dashboard" title with underline tabs. ACE appears as a card on the Dashboard tab and as its own "ACE" tab. Kent navy and gold stay on the hub site, the video and the report.
+- Demo controls (persona switcher, Phone, Email, Data, Advisor, Test, Results) live in a striped gold "ACE PROTOTYPE · SYNTHETIC DATA" bar above FlashLine, so nobody mistakes them for FlashLine features.
+- Hub photos: Kent State UCM photography in assets/photos (campus at dusk, students walking, VR, drones, plus a five-photo band before the team section), always under a navy overlay at 85% or more so text stays at AA contrast.
+- Screenshots in assets/shots are 2x captures of the prototype with Jordan's real demo data and the prototype bar hidden.

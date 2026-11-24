@@ -1,0 +1,51 @@
+<svg class="arch" viewBox="0 0 1200 650" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="archT archD">
+<title id="archT">ACE system architecture</title>
+<desc id="archD">Students sign in through Microsoft Entra ID, open ACE in FlashLine, and each request passes Azure's web application firewall to the ACE service on Kent State's Azure tenant. The service reads Canvas, Banner and Schedule Builder, KSU Navigate and Handshake with read-only access, strips names and IDs before Microsoft Copilot ranks priorities, keeps briefs encrypted for 24 hours, and logs every access to Microsoft Sentinel.</desc>
+<style>
+.arch{font-family:"tablet-gothic",Archivo,"Helvetica Neue",Arial,sans-serif}
+.arch .nd rect{fill:rgba(255,255,255,.045);stroke:rgba(255,255,255,.22);stroke-width:1.2;transition:all .35s}
+.arch .tt{fill:#fff;font-size:17px;font-weight:700}.arch .tt.s{font-size:15px}
+.arch .sb{fill:#EFAB00;font:600 10.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em}
+.arch .bd{fill:#C7D2E4;font-size:12.5px}
+.arch .wire{fill:none;stroke:rgba(199,210,228,.55);stroke-width:2;transition:stroke .35s,opacity .35s}
+.arch .wire.dash{stroke-dasharray:6 6}
+.arch .pl rect{fill:#0B1220;stroke:rgba(199,210,228,.4)}.arch .pl text{fill:#C7D2E4;font:500 10px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.08em}
+.arch .tenant{fill:rgba(0,57,118,.35);stroke:#EFAB00;stroke-opacity:.6;stroke-dasharray:4 7;stroke-width:1.5}
+.arch .tlabel{fill:#EFAB00;font:600 11px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em}
+.arch .waf rect{fill:rgba(239,171,0,.12);stroke:#EFAB00;stroke-width:1.4}
+.arch .waf text{fill:#EFAB00;font:700 12px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.3em}
+.arch .ic{fill:none;stroke:#EFAB00;stroke-width:2}
+.arch .an,.arch .wire,.arch .pl,.arch .waf{transition:opacity .35s}
+.arch.focus .an:not(.on),.arch.focus .wire:not(.on),.arch.focus .waf:not(.on),.arch.focus .pl:not(.on){opacity:.22}
+.arch .an.on .nd rect,.arch .an.on.nd rect{stroke:#EFAB00;stroke-width:2;fill:rgba(239,171,0,.09)}
+.arch .wire.on{stroke:#EFAB00;stroke-dasharray:7 7;animation:flow .9s linear infinite}
+.arch .an{cursor:pointer;outline:none}.arch .an:focus-visible rect{stroke:#fff;stroke-width:2.5}
+@keyframes flow{to{stroke-dashoffset:-28}}
+@media (prefers-reduced-motion:reduce){.arch .wire.on{animation:none}}
+</style>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#C7D2E4"/></marker></defs>
+<rect class="tenant" x="330" y="28" width="562" height="600" rx="24"/>
+<text class="tlabel" x="420" y="58">KENT STATE AZURE TENANT · US ONLY</text>
+<g class="waf" data-k="waf"><rect x="350" y="86" width="44" height="520" rx="10"/><text transform="translate(377 346) rotate(-90)" text-anchor="middle">AZURE WAF SHIELD</text></g>
+<path class="wire" id="w1" d="M40 572 H18 V120 H34" marker-end="url(#ah)"/>
+<path class="wire" id="w2" d="M150 182 V284" marker-end="url(#ah)"/>
+<path class="wire" id="w3" d="M262 350 H414 V140 H434" marker-end="url(#ah)"/>
+<path class="wire" id="w4" d="M700 165 H905 M905 145 V415 M905 145 H926 M905 235 H926 M905 325 H926 M905 415 H926"/>
+<path class="wire dash" id="w5" d="M703 200 H720 V450 H705" marker-start="url(#ah)" marker-end="url(#ah)"/>
+<path class="wire" id="w6" d="M830 165 V384" marker-end="url(#ah)"/>
+<path class="wire" id="w7" d="M570 230 V248"/>
+<g class="an nd" data-k="users" tabindex="0" role="button" aria-label="Kent State users"><rect x="40" y="520" width="220" height="104" rx="14"/><text class="sb" x="58" y="548">WHO</text><text class="tt" x="58" y="573">Kent State users</text><text class="bd" x="58" y="596">Students and advisors</text></g>
+<g class="ic" transform="translate(232,540) scale(.8)"><circle cx="0" cy="0" r="7"/><path d="M-12 22a12 12 0 0 1 24 0"/><circle cx="-17" cy="6" r="5.5"/><circle cx="17" cy="6" r="5.5"/><path d="M-27 24a10 10 0 0 1 14-9M27 24a10 10 0 0 0-14-9"/></g>
+<g class="an nd" data-k="entra" tabindex="0" role="button" aria-label="Microsoft Entra ID"><rect x="40" y="60" width="220" height="120" rx="14"/><text class="sb" x="58" y="88">IDENTITY</text><text class="tt" x="58" y="113">Microsoft Entra ID</text><text class="bd" x="58" y="136">Single sign-on + MFA</text><text class="bd" x="58" y="154">No new password</text></g>
+<g class="an nd" data-k="front" tabindex="0" role="button" aria-label="Next.js / React"><rect x="40" y="290" width="220" height="120" rx="14"/><text class="sb" x="58" y="318">FRONT END</text><text class="tt" x="58" y="343">Next.js / React</text><text class="bd" x="58" y="366">FlashLine tile</text><text class="bd" x="58" y="384">KSUMobile push</text></g>
+<g class="an nd" data-k="backend" tabindex="0" role="button" aria-label="Python / FastAPI"><rect x="440" y="100" width="260" height="130" rx="14"/><text class="sb" x="458" y="128">ACE SERVICE · APP SERVICE</text><text class="tt" x="458" y="153">Python / FastAPI</text><text class="bd" x="458" y="176">Builds each student's</text><text class="bd" x="458" y="194">morning brief</text></g>
+<g class="an nd" data-k="store" tabindex="0" role="button" aria-label="PostgreSQL + Redis"><rect x="440" y="250" width="260" height="90" rx="14"/><text class="sb" x="458" y="278">DATA</text><text class="tt" x="458" y="303">PostgreSQL + Redis</text><text class="bd" x="458" y="326">AES-256 at rest · 24-hour purge</text></g>
+<g class="an nd" data-k="copilot" tabindex="0" role="button" aria-label="Microsoft Copilot"><rect x="440" y="390" width="260" height="120" rx="14"/><text class="sb" x="458" y="418">AI LAYER</text><text class="tt" x="458" y="443">Microsoft Copilot</text><text class="bd" x="458" y="466">Ranks three priorities</text><text class="bd" x="458" y="484">Zero data retention</text></g>
+<g class="an nd" data-k="sentinel" tabindex="0" role="button" aria-label="Sentinel"><rect x="740" y="390" width="140" height="120" rx="14"/><text class="sb" x="758" y="418">SECURITY</text><text class="tt" x="758" y="443">Sentinel</text><text class="bd" x="758" y="466">Logging, audit,</text><text class="bd" x="758" y="484">SIEM alerts</text></g>
+<g class="an" data-k="sources" tabindex="0" role="button" aria-label="Source systems"><text class="sb" x="930" y="94">SOURCE SYSTEMS · READ ONLY</text><g class="nd"><rect x="930" y="110" width="240" height="70" rx="12"/><text class="tt s" x="948" y="140">Canvas</text><text class="bd" x="948" y="160">Courses, due dates, grades</text></g><g class="nd"><rect x="930" y="200" width="240" height="70" rx="12"/><text class="tt s" x="948" y="230">Banner + Schedule Builder</text><text class="bd" x="948" y="250">Registration, holds, credits</text></g><g class="nd"><rect x="930" y="290" width="240" height="70" rx="12"/><text class="tt s" x="948" y="320">KSU Navigate</text><text class="bd" x="948" y="340">Tutoring, advising, alerts</text></g><g class="nd"><rect x="930" y="380" width="240" height="70" rx="12"/><text class="tt s" x="948" y="410">Handshake</text><text class="bd" x="948" y="430">Jobs and career events</text></g></g>
+<g class="pl" data-w="w2"><rect x="82.0" y="222" width="136" height="22" rx="11"/><text x="150" y="237" text-anchor="middle">OIDC · OAUTH 2.0</text></g>
+<g class="pl" data-w="w3"><rect x="268.0" y="339" width="74" height="22" rx="11"/><text x="305" y="354" text-anchor="middle">TLS 1.3</text></g>
+<g class="pl" data-w="w4"><rect x="725.0" y="154" width="84" height="22" rx="11"/><text x="767" y="169" text-anchor="middle">READ-ONLY</text></g>
+<g class="pl" data-w="w5"><rect x="668.0" y="355" width="104" height="22" rx="11"/><text x="720" y="370" text-anchor="middle">PII STRIPPED</text></g>
+<g class="pl" data-w="w6"><rect x="787.0" y="271" width="86" height="22" rx="11"/><text x="830" y="286" text-anchor="middle">AUDIT LOG</text></g>
+</svg>

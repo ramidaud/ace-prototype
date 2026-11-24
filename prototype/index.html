@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACE Prototype · FlashLine</title>
+<link rel="stylesheet" href="https://use.typekit.net/huk6nbo.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14161b; --side:#111318; --panel:#1d2027; --panel2:#23262e; --line:#2c3039;
+  --text:#f3f4f6; --muted:#a3a9b5; --dim:#7d8390;
+  --blue:#6b9bff; --gold:#f5b400; --orange:#ffb366; --red:#ff7a7a; --green:#5fd39a;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace; --sans:"tablet-gothic",Inter,system-ui,-apple-system,sans-serif;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.45}
+button,select{font:inherit;color:inherit}
+a{color:var(--blue)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--gold);color:#111;padding:8px 12px;border-radius:8px;z-index:50}
+.skip:focus{left:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.mono{font-family:var(--mono);font-size:12px;letter-spacing:.02em}
+
+/* shell */
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:var(--side);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:6px}
+.brand{font-weight:800;font-size:22px;letter-spacing:-.02em;padding:0 10px}
+.brand small{display:block;font:500 10px var(--mono);color:var(--muted);letter-spacing:.08em;margin-top:2px}
+.who{display:flex;gap:10px;align-items:center;padding:16px 10px 12px}
+.avatar{width:40px;height:40px;border-radius:50%;background:#2c3039;display:grid;place-items:center;font-weight:700;color:var(--gold)}
+.who b{display:block;font-size:14px}.who span{font-size:12px;color:var(--muted)}
+nav a{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;color:var(--text);text-decoration:none;font-size:15px}
+nav a:hover{background:#1b1e24}
+nav a[aria-current]{border:1px solid var(--gold);background:#1c1a12;font-weight:700}
+nav a[aria-current]::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--gold)}
+.navsep{border-top:1px solid var(--line);margin:8px 0}
+.persona{margin-top:auto;padding:12px 10px;border:1px dashed #3a3f4a;border-radius:12px}
+.persona label{display:block;font:500 10px var(--mono);letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.persona select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px}
+.persona p{font-size:12px;color:var(--muted);margin:8px 0 0}
+
+main{min-width:0}
+.top{display:flex;align-items:center;gap:16px;padding:14px 28px;border-bottom:1px solid var(--line)}
+.search{flex:1;color:var(--muted);font-size:15px}
+.crumb{color:var(--muted)}.crumb b{color:var(--blue);font-weight:500}
+.tabs{display:flex;gap:6px;padding:14px 28px 0;flex-wrap:wrap}
+.tabs button{background:none;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--text);color:#111;border-color:var(--text);font-weight:600}
+.view{padding:18px 28px 40px}
+[hidden]{display:none!important}
+
+/* header */
+.eyebrow{font:500 13px var(--mono);color:var(--blue);letter-spacing:.04em;text-transform:uppercase}
+.headrow{display:flex;align-items:flex-start;gap:16px;justify-content:space-between;margin:6px 0 18px;flex-wrap:wrap}
+h1{font-size:clamp(26px,3.2vw,40px);line-height:1.1;letter-spacing:-.025em;margin:0;font-weight:800;max-width:900px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 14px}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+.pill.ai .dot{background:var(--green)}
+.pill.fb .dot{background:var(--orange)}
+.pill.busy .dot{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.btn{background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13px}
+.btn:hover{border-color:var(--muted)}
+
+.alert{display:flex;gap:12px;align-items:center;border:1px solid #5a3a3a;background:#2a1b1d;border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:14px}
+.alert b{color:var(--red)}
+
+/* priority cards */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;min-width:0}
+.prio{display:flex;flex-direction:column;gap:6px}
+.prio.first{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.prio .tag{font:500 12px var(--mono);color:var(--blue);text-transform:uppercase}
+.prio.first .tag{color:var(--gold)}
+.prio h2{font-size:20px;margin:0;letter-spacing:-.01em;line-height:1.2}
+.prio p{margin:0;color:var(--muted);font-size:14px}
+.prio .src{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:auto;padding-top:6px;color:var(--muted);font-size:14px}
+.prio .src button{background:none;border:0;padding:0;color:var(--text);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.prio details{font-size:12px;color:var(--dim)}
+.prio summary{cursor:pointer}
+.skel{background:linear-gradient(90deg,#23262e,#2c3039,#23262e);background-size:200% 100%;animation:sh 1.2s infinite;border-radius:6px;height:14px;margin:4px 0}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* stat tiles */
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.lab{font:500 11px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ring{display:flex;gap:16px;align-items:center}
+.ring svg{flex:none}
+.ring b{display:block;font-size:20px}
+.ring span{color:var(--muted);font-size:14px}
+.big{font-size:44px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.big small{font-size:17px;font-weight:500;color:var(--text);margin-left:4px;letter-spacing:0}
+.tile p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.bars{display:flex;gap:8px;align-items:flex-end;height:64px;margin-top:10px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.bars i{display:block;width:100%;border-radius:4px;background:#323642;min-height:4px}
+.bars i.hot{background:var(--orange)}
+.bars em{font:normal 10px var(--mono);color:var(--muted)}
+.bars em.hot{color:var(--orange);font-weight:600}
+.loadword{float:right;color:var(--orange);font-weight:700}
+
+.grid2eq{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.more{margin-top:20px;border-top:1px solid var(--line);padding-top:6px}
+.more summary{cursor:pointer;display:flex;gap:14px;align-items:baseline;padding:10px 4px;list-style:none;font-weight:700;font-size:16px}
+.more summary::-webkit-details-marker{display:none}
+.more summary::before{content:"›";display:inline-block;transition:transform .15s;color:var(--muted)}
+.more[open] summary::before{transform:rotate(90deg)}
+.more summary .mono{color:var(--muted);font-weight:400}
+/* lower */
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-top:16px}
+.list{list-style:none;margin:10px 0 0;padding:0}
+.list li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:16px}
+.list li>span:last-child{color:var(--muted);white-space:nowrap}
+.list li .now{color:var(--gold);font-weight:700}
+.list li .late{color:var(--red);font-weight:700}
+.req{margin-top:12px}
+.req .row{display:flex;justify-content:space-between;font-size:16px;margin-top:12px}
+.track{height:6px;background:#2c3039;border-radius:4px;margin-top:6px;overflow:hidden;display:flex}
+.track i{background:var(--blue)}.track u{background:#3d5a99}
+.foot{color:var(--muted);font-size:13px;margin-top:18px}
+
+/* phone */
+.phone-wrap{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+.phone{width:360px;border:10px solid #050608;border-radius:44px;background:#0d0f13;min-height:720px;padding:18px 14px;position:relative}
+.phone .notch{width:110px;height:24px;background:#050608;border-radius:0 0 14px 14px;margin:-18px auto 14px}
+.push{background:rgba(60,64,74,.85);border-radius:16px;padding:10px 12px;font-size:13px;margin-bottom:16px}
+.push b{display:block}
+.push .mono{color:var(--muted)}
+.phone h3{font-size:22px;margin:4px 0 12px;letter-spacing:-.02em}
+.phone .prio{margin-bottom:10px;padding:14px}
+.phone .prio h2{font-size:17px}
+.phone-notes{max-width:360px;color:var(--muted)}
+#lock{min-height:600px;display:flex;flex-direction:column;justify-content:flex-start;background:radial-gradient(circle at 50% 20%,#25324f,#0d0f13 70%);margin:-4px -2px;border-radius:24px;padding:16px 8px}
+.lockclock{text-align:center;margin:28px 0 36px}
+.lockclock span{display:block;font-size:14px;color:#cfd6e4}
+.lockclock b{display:block;font-size:72px;font-weight:600;letter-spacing:-.04em;line-height:1}
+button.push{display:block;width:100%;text-align:left;border:0;cursor:pointer;color:var(--text)}
+button.push:hover{background:rgba(75,80,92,.95)}
+.push .papp{display:flex;justify-content:space-between}
+.push .ico{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;background:#002664;color:var(--gold);font:700 10px var(--sans);margin-right:6px;vertical-align:-4px}
+
+/* email */
+.mail{max-width:760px;background:#fff;color:#1d1d1f;border-radius:12px;overflow:hidden}
+.mail header{background:#002664;color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.mail header b{font-size:16px}
+.mail .meta{padding:14px 20px;border-bottom:1px solid #e5e5ea;font-size:14px}
+.mail .meta div{margin:2px 0}
+.mail pre{white-space:pre-wrap;font:15px/1.55 var(--sans);padding:18px 20px;margin:0}
+.mail .ctaRow{padding:0 20px 20px}
+.mail .cta{display:inline-block;background:#002664;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none}
+
+/* compliance */
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:12px}
+.flow .card{padding:14px}
+.flow h3{margin:0 0 4px;font-size:15px}
+.flow p{margin:0;font-size:13px;color:var(--muted)}
+.checks{list-style:none;padding:0;margin:8px 0 0}
+.checks li{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--line);font-size:14px}
+.checks li b{display:block}
+.checks li div span{color:var(--muted)}
+.checks li>span{font-weight:700}
+.ok{color:var(--green)}.todo{color:var(--orange)}
+.fields{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.fields code{font:12px var(--mono);background:var(--panel2);border:1px solid var(--line);padding:3px 8px;border-radius:6px}
+.fields code.out{text-decoration:line-through;color:var(--dim)}
+h2.sec{font-size:20px;margin:22px 0 4px}
+
+/* dialog */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:40}
+.modal .card{max-width:440px}
+.modal h2{margin:0 0 8px;font-size:18px}
+
+.tester{border:1px dashed #3a3f4a;border-radius:12px;padding:10px 14px;color:var(--muted);font-size:13px;margin-bottom:14px}
+.tester b{color:var(--text)}
+
+/* demo student bar */
+.demobar{margin:14px 28px 0;padding:12px 16px;border:1px solid #4a4220;background:linear-gradient(90deg,#1f1c10,#191b20);border-radius:14px}
+.demohead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.demohead .mono{color:var(--gold);letter-spacing:.06em}
+.demohint{color:var(--muted)!important;letter-spacing:0!important}
+.pchips{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:2px}
+.pchip{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer;text-align:left}
+.pchip b{font-size:16px}.pchip small{font-size:12px;color:var(--muted)}
+.pchip:hover{border-color:var(--muted)}
+.pchip[aria-pressed=true]{border-color:var(--gold);background:#2a2615;box-shadow:0 0 0 1px var(--gold) inset}
+.pchip[aria-pressed=true] small{color:#e9d9a0}
+#personaStory{margin:10px 0 0;color:#d5d9e0;font-size:14px}
+body.testing .demobar{display:none}
+/* ACE character */
+.botwrap{flex:none;display:flex;flex-direction:column;align-items:center;width:140px;gap:2px}
+.bot{width:92px;height:auto}
+.bubble{position:relative;max-width:140px;text-align:center;background:var(--text);color:#111;font-weight:700;font-size:12px;line-height:1.25;padding:5px 10px;border-radius:12px}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:var(--text)}
+.headrow{align-items:center}
+.headrow h1{flex:1;min-width:260px}
+/* advisor */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--muted)}
+.chip b{color:var(--text)}
+.advgrid{display:grid;grid-template-columns:minmax(300px,1fr) 1.4fr;gap:16px;align-items:start}
+.advlist{display:flex;flex-direction:column;gap:8px;max-height:78vh;overflow:auto;padding-right:4px}
+.advrow{display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer}
+.advrow:hover{border-color:var(--muted)}
+.advrow.hot{border-left:4px solid var(--red)}
+.advrow[aria-current]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.advname{font-weight:700;font-size:16px}
+.advmeta{color:var(--muted);font-size:13px}
+.flags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.flag{font:500 11px var(--mono);border:1px solid var(--line);border-radius:6px;padding:2px 6px;color:var(--muted)}
+.flag.red{color:var(--red);border-color:#5a3a3a}.flag.orange{color:var(--orange);border-color:#5a4a2a}
+.flag.blue{color:var(--blue);border-color:#2a3a5a}.flag.ok{color:var(--green)}
+.advprep{position:sticky;top:12px}
+.psec{font-size:13px;font:500 12px var(--mono);text-transform:uppercase;color:var(--muted);margin:18px 0 6px;letter-spacing:.05em}
+.pts{margin:0;padding-left:20px}.pts li{margin:6px 0}
+/* test mode */
+.tcard{max-width:720px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px}
+.tcard h1{margin:4px 0 12px}
+.tcard p,.tcard li{color:#d5d9e0}
+.tl{display:block;margin:14px 0;font-weight:600}
+.tl select,.tl textarea,.tl input{display:block;width:100%;margin-top:6px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--text);font:inherit;font-weight:400}
+.btn.primary{background:var(--gold);color:#111;border-color:var(--gold);font-weight:700;padding:10px 18px;font-size:15px;margin-top:8px}
+.qbar{position:sticky;top:0;z-index:5;background:#101216;border:1px solid var(--gold);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.qbar .mono{color:var(--muted);margin-bottom:6px}
+.qbar b{display:block;font-size:18px;outline:none}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.opt{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;font-size:14px}
+.opt:hover{border-color:var(--gold)}
+.portals{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.portals button{background:#1a1d23;border:1px solid var(--line);border-bottom:0;border-radius:8px 8px 0 0;padding:8px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+.portals button[aria-selected=true]{background:#e8e9ec;color:#222;font-weight:600}
+.portal{background:#f4f4f6;color:#222;border-radius:8px;padding:14px 16px;font-size:14px}
+.portal h3{margin:0 0 8px;font-size:16px}
+.raw{margin:4px 0 10px;padding-left:18px}.raw li{margin:3px 0}
+.rawcard{border:1px solid #d6d7dc;border-radius:6px;padding:8px 10px;margin-bottom:8px;background:#fff}
+fieldset.rate,fieldset.lik{border:1px solid var(--line);border-radius:10px;margin:12px 0;padding:10px 14px}
+fieldset legend{padding:0 4px}
+fieldset.rate legend span{color:var(--muted);font-size:13px}
+fieldset.rate label{display:inline-flex;gap:6px;margin:6px 16px 0 0;align-items:center}
+.likrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}
+.likrow label{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;cursor:pointer;padding:6px;border-radius:8px}
+.likrow label:has(input:checked){background:#2a2615;outline:1px solid var(--gold)}
+.likrow small{font-size:11px;color:var(--muted)}
+.tt{border-collapse:collapse;width:100%;margin:12px 0}.tt td,.tt th{border-bottom:1px solid var(--line);padding:8px;text-align:left}
+.rbar{display:grid;grid-template-columns:minmax(120px,38%) 1fr 60px;gap:10px;align-items:center;margin:6px 0;font-size:14px}
+.rbar div{background:#2c3039;border-radius:4px;height:12px;overflow:hidden}
+.rbar i{display:block;height:100%;background:var(--gold)}.rbar i.base{background:#6b7280}
+.rbar b{text-align:right}
+body.testing aside,body.testing .tabs,body.testing .top{display:none}
+body.testing .app{grid-template-columns:1fr}
+@media (max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr)}.flow{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:820px){
+  .app{grid-template-columns:1fr}
+  aside{border-right:0;border-bottom:1px solid var(--line);padding:12px}
+  aside nav,.who,.navsep{display:none}
+  .persona{margin-top:8px}
+  .top{padding:12px 16px}.crumb{display:none}
+  .tabs,.view{padding-left:16px;padding-right:16px}
+  .grid3,.grid2,.grid4,.grid2eq,.advgrid{grid-template-columns:1fr}
+  .demobar{margin:10px 16px 0}.demohint{display:none}
+  .botwrap{flex-direction:row;width:auto;gap:8px}.bot{width:60px;order:-1}
+  .bubble::after{left:-5px;top:50%;bottom:auto;margin:-5px 0 0;border:5px solid transparent;border-left:0;border-right-color:var(--text)}
+  .advprep{position:static}
+  .more summary .mono{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#ace-main">Skip to ACE</a>
+<div class="app">
+  <aside aria-label="FlashLine navigation">
+    <div class="brand">Flashline<small>ACE PROTOTYPE</small></div>
+    <div class="who"><div class="avatar" id="avatar" aria-hidden="true">·</div><div><b id="whoName">Loading…</b><span id="whoSub">Sample student</span></div></div>
+    <nav>
+      <a href="#ace" onclick="return false">Welcome</a>
+      <a href="#ace" onclick="return false">Student</a>
+      <a href="#ace" aria-current="page">ACE</a>
+      <a href="#ace" onclick="return false">Employee</a>
+      <a href="#ace" onclick="return false">University Resources</a>
+      <div class="navsep"></div>
+      <a href="#ace" onclick="return false">Settings</a>
+    </nav>
+  </aside>
+
+  <main id="ace-main" tabindex="-1">
+    <div class="top"><div class="search">Search Flashline…</div><div class="crumb mono">flashline / student / <b>ace</b></div></div>
+    <div class="demobar" id="demobar" role="group" aria-labelledby="demoLab">
+      <div class="demohead"><span id="demoLab" class="mono">VIEWING AS A DEMO STUDENT (SYNTHETIC)</span><span class="mono demohint">switch to see how ACE changes</span></div>
+      <div class="pchips" id="personaChips"></div>
+      <p id="personaStory" aria-live="polite"></p>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Prototype views">
+      <button role="tab" aria-selected="true" aria-controls="v-dash" id="t-dash">Dashboard</button>
+      <button role="tab" aria-selected="false" aria-controls="v-phone" id="t-phone">Phone</button>
+      <button role="tab" aria-selected="false" aria-controls="v-mail" id="t-mail">Email backup</button>
+      <button role="tab" aria-selected="false" aria-controls="v-trust" id="t-trust">How ACE handles data</button>
+      <button role="tab" aria-selected="false" aria-controls="v-adv" id="t-adv">Advisor view</button>
+      <button role="tab" aria-selected="false" aria-controls="v-test" id="t-test">Test mode</button>
+      <button role="tab" aria-selected="false" aria-controls="v-results" id="t-results">Results</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="view" id="v-dash" role="tabpanel" aria-labelledby="t-dash">
+      <div class="eyebrow">ACE / Academic &amp; Career Executive Assistant</div>
+      <div class="headrow">
+        <div class="botwrap"><span class="bubble" id="botSay" aria-live="polite">Morning!</span><img id="botImg" class="bot" src="../assets/ace-hello.gif" alt="ACE, the assistant character" width="96" height="106"></div>
+        <h1 id="headline">Loading your day…</h1>
+        <div class="pills">
+          <span class="pill mono" id="syncPill"><span class="dot"></span><span id="syncText">connecting…</span></span>
+          <span class="pill mono fb" id="aiPill" aria-live="polite"><span class="dot"></span><span id="aiText">brief: loading</span></span>
+          <button class="btn" id="regen" type="button">Regenerate brief</button>
+        </div>
+      </div>
+      <div id="holdBox"></div>
+      <div class="grid3" id="prios" aria-live="polite" aria-label="Today's priorities"></div>
+      <div class="grid2eq">
+        <div class="card tile" id="tReg"></div>
+        <div class="card tile" id="tCareer"></div>
+      </div>
+      <details class="more" id="more">
+        <summary><span>Details</span><span class="mono">graduation · workload · coming up · degree requirements</span></summary>
+      <div class="grid2eq">
+        <div class="card tile" id="tGrad"></div>
+        <div class="card tile" id="tLoad"></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="lab">Coming up</div><ul class="list" id="upcoming"></ul></div>
+        <div class="card"><div class="lab">Degree requirements</div><div class="req" id="reqs"></div>
+          <div class="foot" id="reqFoot">Based on your GPS audit. Check big decisions with your advisor.</div></div>
+      </div>
+      </details>
+    </section>
+
+    <!-- PHONE -->
+    <section class="view" id="v-phone" role="tabpanel" aria-labelledby="t-phone" hidden>
+      <div class="phone-wrap">
+        <div class="phone" aria-label="Phone preview">
+          <div class="notch"></div>
+          <div id="lock">
+            <div class="lockclock"><span id="lockDay"></span><b id="lockTime">7:30</b></div>
+            <button class="push" id="push" type="button" aria-label="Open ACE from notification"></button>
+            <p class="mono" style="text-align:center;color:var(--dim)">Tap the notification</p>
+          </div>
+          <div id="panel" hidden>
+            <button class="btn" id="relock" type="button" style="font-size:12px;margin-bottom:10px">‹ Lock screen</button>
+            <img src="../assets/ace-happy.gif" alt="" width="56" height="62" style="float:right;margin:-6px -4px 0 6px">
+            <div class="eyebrow" style="font-size:11px">ACE · OPENED FROM KSUMOBILE</div>
+            <h3 id="pHead"></h3>
+            <div id="pPrios"></div>
+          </div>
+        </div>
+        <div class="phone-notes">
+          <h2 class="sec" style="margin-top:0">Meeting students on their phones</h2>
+          <p>Each day's priorities arrive as a push notification from KSUMobile, the app Kent students already have. Students see what needs attention without opening anything. Tapping it opens the full ACE panel.</p>
+          <label class="lab" for="notifyTime" style="display:block;margin-top:14px">When should ACE notify you?</label>
+          <select id="notifyTime" style="margin-top:6px;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px">
+            <option value="6:30">Early morning (6:30 am)</option>
+            <option value="7:30" selected>Before my first class (7:30 am)</option>
+            <option value="12:00">At lunch (12:00 pm)</option>
+            <option value="17:30">After work (5:30 pm)</option>
+          </select>
+          <p>No new app, account or website: ACE lives inside FlashLine and KSUMobile, which meets Dr. Tang's condition. Kent email is the backup channel.</p>
+          <p class="mono">Tip for testing: open this page on an actual phone. The dashboard reflows to one column on its own.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMAIL -->
+    <section class="view" id="v-mail" role="tabpanel" aria-labelledby="t-mail" hidden>
+      <div class="mail" id="mail"></div>
+      <p class="foot">Backup channel. If a student turns off KSUMobile notifications or misses the push, the same reminder goes to their Kent email.</p>
+    </section>
+
+    <!-- TRUST / COMPLIANCE -->
+    <section class="view" id="v-trust" role="tabpanel" aria-labelledby="t-trust" hidden>
+      <div class="eyebrow">Transparency</div>
+      <h1 style="font-size:32px">How ACE handles your data</h1>
+      <p style="color:var(--muted);max-width:760px">ACE reads from five systems Kent State already runs. It never changes a record, never submits work and never registers you for a class. Every item links back to the system it came from.</p>
+      <h2 class="sec">1. What ACE reads each morning</h2>
+      <div class="flow" id="flow"></div>
+      <h2 class="sec">2. What the AI sees</h2>
+      <p style="color:var(--muted);max-width:760px;margin:0">Only the fields needed to rank today's priorities are sent to the AI model. Identifiers stay in the database. The model is not trained on student records.</p>
+      <div class="fields" id="fields"></div>
+      <h2 class="sec">3. Kent State review path</h2>
+      <p style="color:var(--muted);max-width:760px;margin:0">Any product used by more than 100 people or touching protected Kent data is reviewed by two teams in the Division of IT before a contract or use: Information Security (HECVAT) and Digital Accessibility (VPAT). This applies to tools built in-house too. Status for this prototype:</p>
+      <ul class="checks" id="checks"></ul>
+      <p class="foot">Prototype note: all students, grades and records on this page are synthetic. No real Kent State data is used.</p>
+    </section>
+    <!-- ADVISOR -->
+    <section class="view" id="v-adv" role="tabpanel" aria-labelledby="t-adv" hidden><div id="advView"></div></section>
+    <!-- TEST MODE -->
+    <section class="view" id="v-test" role="tabpanel" aria-labelledby="t-test" hidden><div id="testView"></div></section>
+    <!-- RESULTS -->
+    <section class="view" id="v-results" role="tabpanel" aria-labelledby="t-results" hidden><div id="resultsView"></div></section>
+  </main>
+</div>
+<div id="modal"></div>
+
+<script>
+/* ===================== config ===================== */
+const SB_URL = "https://gcwuhdofhlebpgaqaran.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdjd3VoZG9maGxlYnBnYXFhcmFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwMzc2OTIsImV4cCI6MjExMDYxMzY5Mn0.ne4ih6e5Ar8fyNyRaW6bQ8bedDnT5YN0rgoDh2fFKmA"; // public anon key, read-only demo data
+const PROJECT = "gcwuhdofhlebpgaqaran";
+
+/* ===================== data layer =====================
+   1) direct REST (page hosted anywhere, or opened from disk)
+   2) claude.ai artifact: viewer's Supabase connector via the mcp capability */
+let transport = null;
+const h = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function direct(path, body, ms = 8000) {
+  const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(SB_URL + path, {
+      method: body ? "POST" : "GET", signal: ctl.signal,
+      headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined });
+    if (!r.ok) throw new Error("http " + r.status);
+    return await r.json();
+  } finally { clearTimeout(t); }
+}
+function parseSqlResult(p) {
+  // execute_sql returns text with a JSON array inside untrusted-data tags
+  let txt = typeof p === "string" ? p : (p?.result ?? p?.content?.[0]?.text ?? JSON.stringify(p));
+  if (typeof txt !== "string") txt = JSON.stringify(txt);
+  try { const o = JSON.parse(txt); if (o && typeof o.result === "string") txt = o.result; else if (Array.isArray(o)) return o; } catch (e) {}
+  const a = txt.indexOf("[{"), b = txt.lastIndexOf("}]");
+  if (a < 0 || b < 0) throw new Error("no rows");
+  return JSON.parse(txt.slice(a, b + 2));
+}
+async function viaMcp(sql) {
+  const mcp = await Promise.race([window.claude?.use?.("mcp"), new Promise(r => setTimeout(() => r(null), 8000))]);
+  if (!mcp) throw new Error("mcp unavailable");
+  const res = await mcp.callTool("Supabase", "execute_sql", { project_id: PROJECT, query: sql });
+  return parseSqlResult(res?.payload ?? res);
+}
+async function q(kind, arg) {
+  const sql = kind === "personas"
+    ? "select coalesce(json_agg(p),'[]') as v from ace_personas p"
+    : `select ace_student_snapshot('${String(arg).replace(/[^0-9a-f-]/gi, "")}') as v`;
+  if (transport !== "mcp") {
+    try {
+      const v = kind === "personas" ? await direct("/rest/v1/ace_personas?select=*")
+                                    : await direct("/rest/v1/rpc/ace_student_snapshot", { p_student: arg });
+      transport = "direct"; return v;
+    } catch (e) { if (transport === "direct") throw e; }
+  }
+  const rows = await viaMcp(sql); transport = "mcp";
+  let v = rows[0]?.v; if (typeof v === "string") v = JSON.parse(v);
+  return v;
+}
+
+/* ===================== AI brief ===================== */
+const FIELDS_SENT = ["first_name","class_level","major","minor","campus","expected_grad_term","credits_earned","credits_in_progress","credits_required","first_generation","college_credit_plus","transfer","advisor_name","courses","upcoming","recent_grades","gps_audit","registration","holds","key_dates","spring_sections_for_open_core","support_services","early_alerts","career_events","jobs"];
+const FIELDS_KEPT = ["banner_id","last_name","email","advisor_email","gpa","student id"];
+function minimize(s) {
+  const st = s.student || {}; const pick = {};
+  FIELDS_SENT.slice(0, 13).forEach(k => pick[k] = st[k]);
+  const out = { today: s.today, student: pick };
+  FIELDS_SENT.slice(13).forEach(k => out[k] = s[k]);
+  // send Eastern local times, not UTC, so the model never shifts a due date by a day
+  const et = iso => iso ? new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) + " ET" : iso;
+  out.upcoming = (s.upcoming || []).map(u => ({ ...u, due_at: et(u.due_at) }));
+  out.recent_grades = (s.recent_grades || []).map(u => ({ ...u, due_at: et(u.due_at) }));
+  out.career_events = (s.career_events || []).map(u => ({ ...u, starts_at: et(u.starts_at) }));
+  if (s.registration) out.registration = { ...s.registration, opens_at: et(s.registration.opens_at) };
+  return out;
+}
+function prompt(data) {
+  return `You are ACE, the Academic & Career Executive assistant inside Kent State University's FlashLine portal.
+Today is ${data.today}. Below is one student's data, read (never changed) from Canvas, the GPS degree audit, Visual Schedule Builder, Navigate360, Handshake and FlashLine holds. Write this student's morning brief.
+
+Rules:
+- Choose the 3 most important things, ranked by urgency and consequence: work due today or overdue, anything blocking registration or graduation, falling grades, then opportunities.
+- Use only facts in the data. Never invent dates, scores, course sections, services or people.
+- Each item names its source system(s) and one action that sends the student back to that system. ACE never submits work or registers for the student.
+- action is a short button label of 2 to 4 words, such as "Open in Canvas" or "Book in Navigate360".
+- label is a short category tag, such as "Due tonight", "Overdue", "Registration blocked" or "Career". It is never the action.
+- Holds come from FlashLine. Early alerts, tutoring and advising come from Navigate360.
+- All times are US Eastern. Use days_until for countdowns.
+- For degree or major decisions, point to the student's advisor by name.
+- Warm, plain and specific, in second person. No em dashes. title at most 60 characters, detail at most 160 characters, label at most 28 characters.
+- headline like "Good morning, <first name>. 3 things need you today." (at most 70 characters).
+
+Return only JSON in this shape:
+{"headline": string, "items": [{"rank": 1, "label": string, "title": string, "detail": string, "source": string, "action": string}]}
+
+DATA:
+${JSON.stringify(data)}`;
+}
+function parseBrief(t) {
+  if (t && typeof t === "object") return t;
+  const a = t.indexOf("{"), b = t.lastIndexOf("}");
+  const o = JSON.parse(t.slice(a, b + 1));
+  if (!o.headline || !Array.isArray(o.items) || !o.items.length) throw new Error("bad brief");
+  return o;
+}
+const briefCache = {};
+async function liveBrief(snap, force) {
+  const id = snap.student.id;
+  if (briefCache[id] && !force) return briefCache[id];
+  // A) Claude via the artifact's sample capability
+  const sample = await Promise.race([window.claude?.use?.("sample"), new Promise(r => setTimeout(() => r(null), 4000))]).catch(() => null);
+  if (sample) {
+    try {
+      const r = await sample(prompt(minimize(snap)), { modelTier: "quick", cache: !force });
+      return briefCache[id] = { brief: parseBrief(r.text), engine: "Claude" };
+    } catch (e) { console.warn("sample failed", e); }
+  }
+  // B) Gemini via Supabase Edge Function (when hosted outside claude.ai)
+  if (transport === "direct") {
+    try {
+      const r = await direct("/functions/v1/ace-brief", { student_id: id }, 60000);
+      return briefCache[id] = { brief: parseBrief(r.brief), engine: "Gemini" };
+    } catch (e) { console.warn("edge function unavailable", e); }
+  }
+  throw new Error("no live AI");
+}
+
+/* ===================== helpers ===================== */
+const today = () => new Date(state.snap.today + "T12:00:00");
+const fmtDay = iso => new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "America/New_York" });
+const dueLabel = u => u.days_until < 0 ? `<span class="late">${-u.days_until}d late</span>`
+  : u.days_until === 0 ? `<span class="now">Tonight</span>`
+  : u.days_until < 7 ? new Date(u.due_at).toLocaleDateString("en-US", { weekday: "short", timeZone: "America/New_York" })
+  : fmtDay(u.due_at);
+function toast(title, body) {
+  const m = document.getElementById("modal");
+  m.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="card"><h2 id="mt">${h(title)}</h2><p style="color:var(--muted)">${h(body)}</p><button class="btn" id="mclose">Close</button></div></div>`;
+  const close = () => { m.innerHTML = ""; document.removeEventListener("keydown", esc); };
+  const esc = e => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", esc);
+  m.querySelector("#mclose").onclick = close; m.querySelector(".modal").onclick = e => { if (e.target.classList.contains("modal")) close(); };
+  m.querySelector("#mclose").focus();
+}
+
+/* ===================== ACE character ===================== */
+const BOT = { hello: "../assets/ace-hello.gif", thinking: "../assets/ace-thinking.gif", happy: "../assets/ace-happy.gif",
+              alert: "../assets/ace-alert.gif", wink: "../assets/ace-wink.gif", done: "../assets/ace-done.gif" };
+Object.values(BOT).forEach(src => { const i = new Image(); i.src = src; });   // preload so mood swaps don't flash
+function setBot(mood, say) {
+  const img = document.getElementById("botImg"); if (!img) return;
+  if (!img.src.endsWith(BOT[mood])) img.src = BOT[mood];
+  if (say) document.getElementById("botSay").textContent = say;
+}
+
+/* ===================== render ===================== */
+const state = { personas: [], snap: null, brief: null, engine: "" };
+
+function prioHTML(it, i, compact) {
+  return `<article class="card prio ${i === 0 ? "first" : ""}">
+    <div class="tag">${String(it.rank ?? i + 1).padStart(2, "0")} / ${h(it.label)}</div>
+    <h2>${h(it.title)}</h2>
+    <p>${h(it.detail)}</p>
+    <div class="src">From ${h(it.source)} · <button type="button" data-act="${h(it.action)}" data-src="${h(it.source)}">${h(it.action)} ›</button></div>
+    ${compact ? "" : `<details><summary>Why am I seeing this?</summary>ACE ranked this from your ${h(it.source)} data this morning. It links you back to the original system; ACE does not change anything there.</details>`}
+  </article>`;
+}
+function renderBrief(loading) {
+  const P = document.getElementById("prios");
+  if (loading && !state.brief) { P.innerHTML = [0,1,2].map(() => `<div class="card"><div class="skel" style="width:40%"></div><div class="skel" style="height:22px"></div><div class="skel"></div></div>`).join(""); return; }
+  const b = state.brief;
+  document.getElementById("headline").textContent = b.headline;
+  P.innerHTML = b.items.slice(0, 3).map((it, i) => prioHTML(it, i)).join("");
+  document.getElementById("pHead").textContent = b.headline;
+  document.getElementById("pPrios").innerHTML = b.items.slice(0, 3).map((it, i) => prioHTML(it, i, true)).join("");
+  renderPush();
+  const st0 = state.snap && state.snap.student;
+  const worry = state.snap && (state.snap.holds.length || state.snap.early_alerts.length);
+  setBot(loading ? "thinking" : worry ? "alert" : "happy",
+    loading ? "Checking your 5 systems…" : worry ? `Heads up, ${st0.first_name}!` : `Morning, ${st0 ? st0.first_name : ""}!`);
+  const pill = document.getElementById("aiPill");
+  pill.className = "pill mono " + (state.engine === "scripted" ? "fb" : "ai") + (loading ? " busy" : "");
+  document.getElementById("aiText").textContent = loading ? "AI brief: generating…" :
+    state.engine === "scripted" ? "brief: stored copy" : `AI brief · ${state.engine}`;
+}
+function renderTiles(s) {
+  const st = s.student;
+  // graduation ring
+  const pct = Math.round(100 * st.credits_earned / st.credits_required);
+  const C = 2 * Math.PI * 34;
+  const trouble = s.holds.length || s.early_alerts.length || s.upcoming.some(u => u.days_until < 0);
+  document.getElementById("tGrad").innerHTML = `<div class="ring">
+    <svg width="84" height="84" viewBox="0 0 84 84" role="img" aria-label="${pct}% of credits earned">
+      <circle cx="42" cy="42" r="34" fill="none" stroke="#2c3039" stroke-width="9"/>
+      <circle cx="42" cy="42" r="34" fill="none" stroke="var(--blue)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C * pct / 100} ${C}" transform="rotate(-90 42 42)"/>
+      <text x="42" y="48" text-anchor="middle" fill="#fff" font-size="18" font-weight="700" font-family="Inter">${pct}%</text></svg>
+    <div><div class="lab">${st.college_credit_plus ? "College credit" : "Graduation"}</div>
+      <b style="color:${trouble ? "var(--orange)" : "var(--text)"}">${st.college_credit_plus ? "Earning college credit" : trouble ? "Needs attention" : "On track"}</b>
+      <span>${st.expected_grad_term ? h(st.expected_grad_term) + " · " : ""}${st.credits_earned} of ${st.credits_required} credits</span></div></div>`;
+  // workload: Mon-Sun of the anchor week, weighted by points
+  const t = today(); const mon = new Date(t); mon.setDate(t.getDate() - ((t.getDay() + 6) % 7));
+  const days = [...Array(7)].map((_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
+  const key = d => d.toISOString().slice(0, 10);
+  const load = days.map(d => s.upcoming.concat(s.recent_grades.map(g => ({ ...g, points: g.points })))
+    .filter(u => new Date(u.due_at).toLocaleDateString("en-CA", { timeZone: "America/New_York" }) === key(d))
+    .reduce((a, u) => a + Number(u.points || 0), 0));
+  const max = Math.max(1, ...load), hot = load.indexOf(Math.max(...load));
+  const total = load.reduce((a, b) => a + b, 0);
+  const word = total > 220 ? "Heavy" : total > 110 ? "Moderate" : "Light";
+  document.getElementById("tLoad").innerHTML = `<div class="lab">Workload / week <span class="loadword">${word}</span></div>
+    <div class="bars" role="img" aria-label="Points due each day this week: ${days.map((d, i) => "MTWTFSS"[i] + " " + load[i]).join(", ")}">
+    ${days.map((d, i) => `<div><i class="${i === hot && load[i] ? "hot" : ""}" style="height:${Math.max(6, 100 * load[i] / max)}%"></i><em class="${i === hot && load[i] ? "hot" : ""}">${["M","T","W","TH","F","S","S"][i]}</em></div>`).join("")}</div>`;
+  // registration / next priority
+  const reg = s.registration; const block = s.holds.find(x => x.blocks_registration);
+  document.getElementById("tReg").innerHTML = reg ? (reg.days_until >= 0
+    ? `<div class="lab">Next priority</div><div class="big">${reg.days_until}<small>days</small></div><p>until ${h(reg.term)} registration opens${block ? ` · <b style="color:var(--red)">hold on account</b>` : ""}</p>`
+    : `<div class="lab">Registration</div><div class="big" style="font-size:30px">Open now</div><p>${h(reg.term)} registration opened ${fmtDay(reg.opens_at)}</p>`)
+    : `<div class="lab">Registration</div><p>No window on file</p>`;
+  // career
+  const ev = s.career_events[0], job = s.jobs[0];
+  document.getElementById("tCareer").innerHTML = ev
+    ? `<div class="lab">Career milestone</div><div class="big">${ev.days_until}<small>days</small></div><p>until ${h(ev.title)}</p>`
+    : job ? `<div class="lab">Career milestone</div><div class="big">${job.days_until}<small>days</small></div><p>to apply: ${h(job.title)}</p>` : `<div class="lab">Career</div><p>Nothing scheduled</p>`;
+}
+function renderLists(s) {
+  document.getElementById("upcoming").innerHTML = s.upcoming.slice(0, 7).map(u =>
+    `<li><span>${h(u.title)} · ${h(u.course)}</span><span>${dueLabel(u)}</span></li>`).join("") || "<li><span>Nothing due in the next three weeks</span><span></span></li>";
+  const blocks = {};
+  s.gps_audit.forEach(g => { const b = blocks[g.block] ||= { req: 0, done: 0, ip: 0 }; b.req += g.required; b.done += g.completed; b.ip += g.in_progress; });
+  document.getElementById("reqs").innerHTML = Object.entries(blocks).map(([k, b]) => {
+    const d = Math.min(100, 100 * b.done / b.req), ip = Math.min(100 - d, 100 * b.ip / b.req);
+    return `<div class="row"><span>${h(k)}</span><span>${b.done} / ${b.req}</span></div>
+      <div class="track" role="img" aria-label="${h(k)}: ${b.done} of ${b.req} credits complete, ${b.ip} in progress"><i style="width:${d}%"></i><u style="width:${ip}%"></u></div>`;
+  }).join("");
+  document.getElementById("reqFoot").textContent = `Based on your GPS audit. Darker blue is in progress this term. Check big decisions with ${s.student.advisor_name || "your advisor"}.`;
+  // holds banner
+  document.getElementById("holdBox").innerHTML = s.holds.map(x =>
+    `<div class="alert" role="status"><b>Hold</b><span>${h(x.description)}. Fix it through: ${h(x.resolve_at)}.</span></div>`).join("") +
+    s.early_alerts.map(a => `<div class="alert" role="status" style="border-color:#5a4a2a;background:#2a241b"><b style="color:var(--orange)">Instructor note</b><span>${h(a.raised_by)} (${h(a.course)}): ${h(a.reason)}.</span></div>`).join("");
+}
+function renderSync(s) {
+  const last = s.sync[0];
+  const t = last ? new Date(last.synced_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }).toLowerCase() : "–";
+  document.getElementById("syncText").textContent = `synced ${t} · ${s.sync.length} sources`;
+  document.getElementById("flow").innerHTML = [
+    ["Canvas", "Courses, assignments, due dates, grades"],
+    ["GPS audit", "Degree requirements and credits"],
+    ["Schedule Builder", "Open Spring sections that fit"],
+    ["Navigate360", "Tutoring, advising, instructor alerts"],
+    ["Handshake", "Career events and job deadlines"]].map(([n, d]) => {
+      const row = s.sync.find(x => x.source === n);
+      return `<div class="card"><h3>${n}</h3><p>${d}</p><p class="mono" style="margin-top:6px">read-only · ${row ? row.records + " records · " + new Date(row.synced_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "America/New_York" }) : ""}</p></div>`;
+    }).join("");
+  document.getElementById("fields").innerHTML = FIELDS_SENT.map(f => `<code>${f}</code>`).join("") + FIELDS_KEPT.map(f => `<code class="out" title="Not sent to the AI">${f}</code>`).join("");
+  document.getElementById("checks").innerHTML = [
+    ["ok", "Single sign-on, no new account", "Opens from a FlashLine tile or a KSUMobile notification with the student's existing Kent login (Entra ID, OIDC)."],
+    ["ok", "Read-only access", "ACE reads source systems and links back. It never writes to Canvas, Banner or Navigate360."],
+    ["ok", "Data minimization", "Names beyond first name, IDs, emails and GPA are not sent to the AI model."],
+    ["ok", "Approved AI model", "Production targets Google Gemini, which already passed Kent's review. Inside claude.ai this preview runs the same prompt on Claude."],
+    ["ok", "Keyboard and screen reader basics", "Skip link, visible focus, labeled charts, live regions. Works without a mouse."],
+    ["todo", "HECVAT (security and privacy questionnaire)", "Team is mapping questions against ACE's design. Required before any pilot."],
+    ["todo", "VPAT (accessibility conformance report)", "Formal WCAG 2.1 AA testing still to do."],
+    ["todo", "FERPA review and data-sharing terms", "Needs agreements with Instructure, EAB and Handshake for production feeds."],
+    ["todo", "Pilot scope", "Kent Campus first, connecting Canvas and the GPS audit; then Navigate360, Schedule Builder and Handshake."]
+  ].map(([s, t, d]) => `<li><span class="${s}" aria-hidden="true">${s === "ok" ? "✓" : "○"}</span><div><b>${t}</b><span>${s === "ok" ? "In prototype. " : "Next step. "}${d}</span></div></li>`).join("");
+}
+function renderMail(s) {
+  const n = s.email_nudge; if (!n) { document.getElementById("mail").innerHTML = ""; return; }
+  const when = new Date(n.send_at).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit", timeZone: "America/New_York" });
+  document.getElementById("mail").innerHTML = `<header><b>Kent State Mail</b><span class="mono">${when}</span></header>
+    <div class="meta"><div><b>From:</b> ACE in FlashLine &lt;ace-noreply@kent.edu&gt;</div><div><b>To:</b> ${h(s.student.first_name)} ${h(s.student.last_name)} (synthetic)</div><div><b>Subject:</b> ${h(n.subject)}</div></div>
+    <pre>${h(n.body)}</pre><div class="ctaRow"><a class="cta" href="#ace" onclick="document.getElementById('t-dash').click();return false">Open ACE in FlashLine</a></div>`;
+
+}
+function renderAll() {
+  const s = state.snap, st = s.student;
+  document.getElementById("whoName").textContent = `${st.first_name} ${st.last_name[0]}.`;
+  document.getElementById("whoSub").textContent = `${st.class_level} · ${st.major}`;
+  document.getElementById("avatar").textContent = st.first_name[0];
+  document.getElementById("personaStory").textContent = s.persona_story || "";
+  renderTiles(s); renderLists(s); renderSync(s); renderMail(s);
+}
+
+function renderPush() {
+  if (!state.brief || !state.snap) return;
+  const t = document.getElementById("notifyTime").value, [hh, mm] = t.split(":").map(Number);
+  const label = `${((hh + 11) % 12) + 1}:${String(mm).padStart(2, "0")}`;
+  document.getElementById("lockTime").textContent = label;
+  document.getElementById("lockDay").textContent = today().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const items = state.brief.items.slice(0, 3);
+  document.getElementById("push").innerHTML = `<div class="papp mono"><span><span class="ico">K</span>KSUMOBILE · ACE</span><span>now</span></div>
+    <b>${h(state.snap.student.first_name)}, ${items.length} things today</b>${items.map(i => h(i.title)).join(" · ")}`;
+}
+
+/* ===================== flow ===================== */
+async function loadStudent(id, forceAI) {
+  try {
+    state.snap = await q("snapshot", id);
+  } catch (e) {
+    document.getElementById("headline").textContent = "Couldn't reach the ACE database.";
+    document.getElementById("syncText").textContent = "offline";
+    document.getElementById("prios").innerHTML = `<div class="card" style="grid-column:1/-1">Open this page from its hosted link or from claude.ai with the Supabase connector enabled. (${h(e.message)})</div>`;
+    return;
+  }
+  renderAll();
+  // show the stored brief immediately, then upgrade to the live one
+  state.brief = state.snap.fallback_brief; state.engine = "scripted";
+  renderBrief(true);
+  try {
+    const r = await liveBrief(state.snap, forceAI);
+    if (state.snap.student.id !== id) return;          // persona changed meanwhile
+    state.brief = r.brief; state.engine = r.engine;
+  } catch (e) { /* stay on stored brief */ }
+  renderBrief(false);
+}
+/* ===================== TEST MODE (user testing) =====================
+   Anonymous. Two rounds, counterbalanced: "current way" (info spread across six
+   mock portals) vs "with ACE". Three timed find-it tasks per round, then accuracy
+   ratings, a Likert survey, and demographics last. One RPC call saves everything. */
+const TEST_PERSONAS = [
+  { id: "a5ec0b99-c333-7351-d6f7-39cbac59f212", name: "Jordan" },
+  { id: "bed004df-fd4e-27f9-071f-c9c473a8cc4f", name: "Priya" },
+];
+const T = { step: 0, setup: {}, rounds: [], tasks: [], ratings: [], survey: {}, demo: {}, snaps: {}, briefs: {} };
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const tv = () => document.getElementById("testView");
+const etDate = iso => new Date(iso).toLocaleString("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+
+async function sqlCall(kind, arg) {
+  if (transport !== "mcp") {
+    try {
+      const v = kind === "submit" ? await direct("/rest/v1/rpc/ace_submit_test", { p: arg })
+                                  : await direct("/rest/v1/rpc/ace_test_results", { p_code: arg });
+      transport = "direct"; return v;
+    } catch (e) { if (transport === "direct") throw e; }
+  }
+  const lit = s => "'" + String(s).replace(/'/g, "''") + "'";
+  const rows = await viaMcp(kind === "submit" ? `select ace_submit_test(${lit(JSON.stringify(arg))}::jsonb) as v`
+                                              : `select ace_test_results(${lit(arg)}) as v`);
+  transport = "mcp"; let v = rows[0]?.v; if (typeof v === "string") { try { v = JSON.parse(v); } catch (e) {} } return v;
+}
+
+function buildTasks(s) {
+  const up = s.upcoming.filter(u => u.days_until >= 0);
+  const next = up[0];
+  const deadlineOpts = shuffle(up.slice(0, 4).map(u => `${u.title} (${u.course})`));
+  const holdKinds = { advising: "Yes, an advising hold", bursar: "Yes, a bursar (payment) hold", ccp: "Yes, a missing CCP form" };
+  const hold = s.holds.find(x => x.blocks_registration);
+  const career = s.career_events;
+  return [
+    { key: "deadline", q: "What is the next thing due that this student hasn't turned in yet?",
+      opts: deadlineOpts, correct: `${next.title} (${next.course})` },
+    { key: "registration", q: "Is anything blocking this student from registering for Spring?",
+      opts: ["No, nothing is blocking it", holdKinds.advising, holdKinds.bursar, holdKinds.ccp],
+      correct: hold ? holdKinds[hold.kind] : "No, nothing is blocking it" },
+    { key: "career", q: "What is the next career event this student can go to?",
+      opts: shuffle(career.slice(0, 4).map(e => e.title)), correct: career[0]?.title },
+  ];
+}
+
+/* ----- "current way": six portals, raw lists, nothing ranked ----- */
+function baselineHTML(s) {
+  const st = s.student;
+  const byCourse = {};
+  [...s.recent_grades.map(g => ({ ...g, done: true })), ...s.upcoming].forEach(a => (byCourse[a.course] ||= []).push(a));
+  const portals = {
+    FlashLine: `<h3>FlashLine · Student</h3>
+      <ul class="raw"><li>Campus announcements: Thanksgiving recess hours for dining halls</li><li>Update your emergency contact information</li>
+      <li>Parking: Winter permit sales open soon</li><li><b>My Registration</b>: ${s.registration ? `Your time to register for ${h(s.registration.term)}: ${etDate(s.registration.opens_at)}` : "No time assigned"}</li>
+      <li><b>Holds</b>: ${s.holds.length ? s.holds.map(x => h(x.description)).join("; ") : "No holds on your account"}</li>
+      <li>Dynamic Checklist: 4 items</li><li>Bursar: view account statement</li><li>Kent State Today: latest news</li></ul>`,
+    Canvas: `<h3>Canvas · Courses</h3>` + Object.entries(byCourse).sort().map(([c, list]) => `<div class="rawcard"><b>${h(c)}</b><ul class="raw">${
+      list.sort((a, b) => a.title.localeCompare(b.title)).map(a => `<li>${h(a.title)} · ${a.done ? `graded ${a.score}/${a.points}` : `due ${etDate(a.due_at)}`}</li>`).join("")}</ul></div>`).join(""),
+    "GPS audit": `<h3>GPS degree audit</h3><ul class="raw">${s.gps_audit.map(g => `<li>${h(g.block)} · ${h(g.requirement)}: ${g.completed}/${g.required} complete, ${g.in_progress} in progress</li>`).join("")}</ul>`,
+    "Schedule Builder": `<h3>Visual Schedule Builder · Spring 2027</h3><ul class="raw">${(s.spring_sections_for_open_core.length ? s.spring_sections_for_open_core : [{ course: "Search for courses", title: "", days: "", time: "", seats_open: "" }])
+      .map(x => `<li>${h(x.course)} ${h(x.title)} · ${h(x.days)} ${h(x.time)} ${x.seats_open !== "" ? "· " + x.seats_open + " seats" : ""}</li>`).join("")}</ul>`,
+    Navigate360: `<h3>KSU Navigate</h3><ul class="raw">${s.support_services.map(x => `<li>${h(x.name)} · ${h(x.hours)}</li>`).join("")}
+      ${s.early_alerts.map(a => `<li>Progress report from ${h(a.raised_by)}</li>`).join("")}<li>Appointments: ${s.appointments.length} past</li></ul>`,
+    Handshake: `<h3>Handshake</h3><b>Jobs</b><ul class="raw">${s.jobs.map(j => `<li>${h(j.title)}, ${h(j.employer)} · apply by ${h(j.apply_by)}</li>`).join("")}</ul>
+      <b>Events</b><ul class="raw">${shuffle(s.career_events).map(e => `<li>${h(e.title)} · ${etDate(e.starts_at)}</li>`).join("")}</ul>`,
+  };
+  const names = Object.keys(portals);
+  return `<div class="portals" role="tablist" aria-label="Portals">${names.map((n, i) => `<button role="tab" data-portal="${i}" aria-selected="${i === 0}">${n}</button>`).join("")}</div>
+    ${names.map((n, i) => `<div class="portal" data-pane="${i}" ${i ? "hidden" : ""}>${portals[n]}</div>`).join("")}`;
+}
+function aceHTML(s, brief) {
+  const reg = s.registration, ev = s.career_events[0];
+  return `<div class="eyebrow">ACE</div><h2 style="font-size:24px;margin:4px 0 12px">${h(brief.headline)}</h2>
+    ${s.holds.map(x => `<div class="alert"><b>Hold</b><span>${h(x.description)}</span></div>`).join("")}
+    <div class="grid3">${brief.items.slice(0, 3).map((it, i) => prioHTML(it, i, true)).join("")}</div>
+    <div class="grid2eq">
+      <div class="card tile"><div class="lab">Next priority</div><div class="big">${reg ? reg.days_until : "–"}<small>days</small></div><p>until ${reg ? h(reg.term) : ""} registration opens${s.holds.some(x => x.blocks_registration) ? ' · <b style="color:var(--red)">hold on account</b>' : ""}</p></div>
+      <div class="card tile"><div class="lab">Career milestone</div><div class="big">${ev ? ev.days_until : "–"}<small>days</small></div><p>${ev ? "until " + h(ev.title) : ""}</p></div></div>
+    <details class="more"><summary><span>Details</span></summary><div class="card" style="margin-top:8px"><div class="lab">Coming up</div>
+      <ul class="list">${s.upcoming.slice(0, 6).map(u => `<li><span>${h(u.title)} · ${h(u.course)}</span><span>${dueLabel(u)}</span></li>`).join("")}</ul></div></details>`;
+}
+
+/* ----- steps ----- */
+function testStart() {
+  tv().innerHTML = `<div class="tcard"><div class="eyebrow">ACE user test · facilitator setup</div><h1 style="font-size:28px">Before you hand this over</h1>
+    <label class="tl">Who is running this session?<select id="tFac"><option>Rami</option><option>Sam</option><option>Allan</option><option>Abisola</option></select></label>
+    <label class="tl">Research method<select id="tMeth"><option>Usability test (think aloud)</option><option>Interview</option><option>Focus group</option></select></label>
+    <p class="mono" style="color:var(--muted)">Then give the device to the tester.</p>
+    <button class="btn primary" id="tGo">Start the test</button></div>`;
+  document.getElementById("tGo").onclick = () => {
+    T.setup = { facilitator: document.getElementById("tFac").value, method: document.getElementById("tMeth").value };
+    testIntro();
+  };
+}
+function testIntro() {
+  tv().innerHTML = `<div class="tcard"><img src="../assets/ace-wink.gif" alt="ACE, the assistant character, winking" width="90" height="99" style="float:right;margin:-8px -6px 0 10px"><div class="eyebrow">Thanks for helping</div><h1 style="font-size:28px">Try ACE for about 5 minutes</h1>
+    <p>ACE is a class prototype for Kent State. You'll look at a pretend student's information two ways and answer a few quick questions. We time how long each answer takes.</p>
+    <ul><li>All student information is made up.</li><li>We don't collect your name or email.</li><li>We're testing the design, not you. If something is hard to find, that's useful to know.</li></ul>
+    <p>You can stop at any time.</p><button class="btn primary" id="tOk">I'm ready</button></div>`;
+  document.getElementById("tOk").onclick = testPrep;
+}
+async function testPrep() {
+  tv().innerHTML = `<div class="tcard"><p>Loading…</p></div>`;
+  const pair = shuffle(TEST_PERSONAS);
+  const first = Math.random() < 0.5 ? "baseline" : "ace";
+  T.setup.order_first = first;
+  T.rounds = [{ condition: first, persona: pair[0] }, { condition: first === "ace" ? "baseline" : "ace", persona: pair[1] }];
+  for (const p of TEST_PERSONAS) T.snaps[p.name] = await q("snapshot", p.id);
+  const aceP = T.rounds.find(r => r.condition === "ace").persona.name;
+  T.briefs[aceP] = { brief: T.snaps[aceP].fallback_brief, engine: "stored" };
+  liveBrief(T.snaps[aceP]).then(r => { T.briefs[aceP] = r; }).catch(() => {});   // upgrade quietly if it arrives in time
+  T.tasks = []; testRoundIntro(0);
+}
+function testRoundIntro(r) {
+  const R = T.rounds[r];
+  const what = R.condition === "ace" ? "<b>with ACE</b>: one panel that pulls everything together."
+    : "<b>the current way</b>: the same information spread across six Kent systems. Tap the tabs to look around.";
+  tv().innerHTML = `<div class="tcard"><div class="eyebrow">Round ${r + 1} of 2</div><h1 style="font-size:28px">Meet ${h(R.persona.name)}</h1>
+    <p>${h(T.snaps[R.persona.name].student.class_level)} · ${h(T.snaps[R.persona.name].student.major)} · ${h(T.snaps[R.persona.name].student.campus)} campus</p><p>This round you'll use ${what}</p>
+    <p>Three questions. Answer as quickly as you can. If you can't find something, choose "I couldn't find it."</p>
+    <button class="btn primary" id="tR">Start round ${r + 1}</button></div>`;
+  document.getElementById("tR").onclick = () => testTask(r, 0);
+}
+function testTask(r, k) {
+  const R = T.rounds[r], s = T.snaps[R.persona.name], tasks = buildTasks(s), task = tasks[k];
+  const brief = (T.briefs[R.persona.name] || { brief: s.fallback_brief }).brief;
+  let clicks = 0; const t0 = performance.now();
+  tv().innerHTML = `<div class="qbar" role="region" aria-label="Question"><div class="mono">Round ${r + 1} · question ${k + 1} of 3 · ${h(R.persona.name)} · today is ${new Date(s.today + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</div>
+      <b id="qText">${h(task.q)}</b><div class="opts">${[...task.opts, "I couldn't find it"].map((o, i) => `<button class="opt" data-i="${i}">${h(o)}</button>`).join("")}</div></div>
+    <div class="stage">${R.condition === "ace" ? aceHTML(s, brief) : baselineHTML(s)}</div>`;
+  tv().querySelectorAll("[data-portal]").forEach(b => b.onclick = () => {
+    clicks++; tv().querySelectorAll("[data-portal]").forEach(x => x.setAttribute("aria-selected", x === b));
+    tv().querySelectorAll("[data-pane]").forEach(p => p.hidden = p.dataset.pane !== b.dataset.portal);
+  });
+  tv().querySelector(".stage").addEventListener("click", e => { if (e.target.closest("summary,[data-act]")) clicks++; });
+  const all = [...task.opts, "I couldn't find it"];
+  tv().querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    const ans = all[+b.dataset.i];
+    T.tasks.push({ condition: R.condition, persona: R.persona.name, task_key: task.key, seconds: +((performance.now() - t0) / 1000).toFixed(2), correct: ans === task.correct, clicks, answer: ans });
+    if (k < 2) testTask(r, k + 1); else if (r === 0) testRoundIntro(1); else testRate();
+  });
+  document.getElementById("qText").focus?.();
+}
+function testRate() {
+  const aceP = T.rounds.find(r => r.condition === "ace").persona.name;
+  const b = T.briefs[aceP] || { brief: T.snaps[aceP].fallback_brief, engine: "stored" };
+  T.setup.engine = b.engine;
+  tv().innerHTML = `<div class="tcard"><div class="eyebrow">Almost done</div><h1 style="font-size:26px">Check ACE's picks for ${h(aceP)}</h1>
+    <p>ACE chose these as ${h(aceP)}'s top priorities. Based on what you saw, is each one correct and worth flagging?</p>
+    ${b.brief.items.slice(0, 3).map((it, i) => `<fieldset class="rate"><legend><b>${i + 1}. ${h(it.title)}</b><br><span>${h(it.detail)}</span></legend>
+      ${["accurate", "partly", "wrong"].map(v => `<label><input type="radio" name="r${i}" value="${v}"> ${v === "accurate" ? "Correct" : v === "partly" ? "Partly" : "Wrong or not important"}</label>`).join("")}</fieldset>`).join("")}
+    <button class="btn primary" id="tNext">Next</button></div>`;
+  document.getElementById("tNext").onclick = () => {
+    T.ratings = b.brief.items.slice(0, 3).map((it, i) => ({ persona: aceP, item_rank: i + 1, item_title: it.title,
+      rating: (tv().querySelector(`input[name=r${i}]:checked`) || {}).value || "skipped" }));
+    testSurvey();
+  };
+}
+const LIKERT = [
+  ["easy_to_see", "ACE made it easy to see what needed attention."],
+  ["trust", "I would trust ACE's priorities to be correct."],
+  ["would_use", "I would use ACE if it were in FlashLine."],
+  ["notification_helpful", "A daily KSUMobile notification from ACE would help me."],
+  ["not_another_platform", "ACE felt like part of FlashLine, not one more thing to check."],
+];
+function testSurvey() {
+  const scale = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
+  tv().innerHTML = `<div class="tcard"><div class="eyebrow">A few quick questions</div><h1 style="font-size:26px">What did you think?</h1>
+    ${LIKERT.map(([k, txt]) => `<fieldset class="lik"><legend>${h(txt)}</legend><div class="likrow">${scale.map((sv, i) => `<label><input type="radio" name="${k}" value="${i + 1}"><span>${i + 1}</span><small>${sv}</small></label>`).join("")}</div></fieldset>`).join("")}
+    <label class="tl">When would a daily ACE notification be most useful?<select id="sNotify"><option value="">Choose one</option><option>Early morning</option><option>Before my first class</option><option>At lunch</option><option>After work or classes</option><option>Evening</option><option>I wouldn't want notifications</option></select></label>
+    <label class="tl">How would you describe ACE to a friend, in a sentence or two?<textarea id="sFriend" rows="3"></textarea></label>
+    <label class="tl">Was anything confusing or missing?<textarea id="sConf" rows="3"></textarea></label>
+    <button class="btn primary" id="tNext">Next</button></div>`;
+  document.getElementById("tNext").onclick = () => {
+    LIKERT.forEach(([k]) => T.survey[k] = +((tv().querySelector(`input[name=${k}]:checked`) || {}).value || 0) || null);
+    T.survey.notify_time = document.getElementById("sNotify").value || null;
+    T.survey.describe_to_friend = document.getElementById("sFriend").value.trim();
+    T.survey.confusing = document.getElementById("sConf").value.trim();
+    testDemo();
+  };
+}
+function testDemo() {
+  tv().innerHTML = `<div class="tcard"><div class="eyebrow">Last step · optional</div><h1 style="font-size:26px">About you</h1>
+    <label class="tl">Which describes you?<select id="dRole"><option value="">Prefer not to say</option><option>Undergraduate student</option><option>Graduate student</option><option>Advisor or staff</option><option>Faculty</option><option>Other</option></select></label>
+    <label class="tl">If you're a student, what year?<select id="dYear"><option value="">Prefer not to say</option><option>First year</option><option>Second year</option><option>Third year</option><option>Fourth year or more</option><option>Graduate</option><option>Not a student</option></select></label>
+    <label class="tl">Are you a first-generation college student?<select id="dFG"><option value="">Prefer not to say</option><option>Yes</option><option>No</option><option>Not sure</option></select></label>
+    <button class="btn primary" id="tDone">Finish</button></div>`;
+  document.getElementById("tDone").onclick = testSubmit;
+}
+async function testSubmit() {
+  const payload = { ...T.setup, role: document.getElementById("dRole").value || null, class_level: document.getElementById("dYear").value || null,
+    first_generation: document.getElementById("dFG").value || null, device: innerWidth < 760 ? "phone" : "computer",
+    tasks: T.tasks, ratings: T.ratings, survey: T.survey };
+  tv().innerHTML = `<div class="tcard"><p>Saving…</p></div>`;
+  let saved = true;
+  try { await sqlCall("submit", payload); } catch (e) { saved = false; console.warn(e); try { localStorage.setItem("ace_unsent_" + Date.now(), JSON.stringify(payload)); } catch (_) {} }
+  const avg = c => { const t = T.tasks.filter(x => x.condition === c); return t.length ? (t.reduce((a, x) => a + x.seconds, 0) / t.length).toFixed(1) : "–"; };
+  const right = c => T.tasks.filter(x => x.condition === c && x.correct).length;
+  tv().innerHTML = `<div class="tcard"><img src="../assets/ace-done.gif" alt="ACE, the assistant character, with a check mark" width="100" height="110" style="float:right;margin:-8px -6px 0 10px"><div class="eyebrow">${saved ? "Saved" : "Not saved"}</div><h1 style="font-size:28px">Thank you!</h1>
+    <table class="tt"><tr><th></th><th>Current way</th><th>With ACE</th></tr>
+      <tr><td>Average time per question</td><td>${avg("baseline")} s</td><td>${avg("ace")} s</td></tr>
+      <tr><td>Correct answers</td><td>${right("baseline")} of 3</td><td>${right("ace")} of 3</td></tr></table>
+    ${saved ? "" : `<p style="color:var(--red)">Couldn't reach the database. The answers were kept on this device; tell the facilitator.</p>`}
+    <p class="mono" style="color:var(--muted)">Hand the device back to the facilitator.</p>
+    <button class="btn" id="tAgain">Start a new session</button></div>`;
+  document.getElementById("tAgain").onclick = () => { Object.assign(T, { tasks: [], ratings: [], survey: {}, briefs: {} }); testStart(); };
+}
+
+/* ----- results (for the report) ----- */
+function resultsInit() {
+  const box = document.getElementById("resultsView");
+  box.innerHTML = `<div class="tcard"><div class="eyebrow">Team only</div><h1 style="font-size:28px">User testing results</h1>
+    <label class="tl">Passcode<input id="rCode" type="password" autocomplete="off"></label><button class="btn primary" id="rGo">Show results</button><p id="rErr" style="color:var(--red)"></p></div>`;
+  document.getElementById("rGo").onclick = async () => {
+    try { const v = await sqlCall("results", document.getElementById("rCode").value.trim()); renderResults(v); }
+    catch (e) { document.getElementById("rErr").textContent = "Couldn't load results (check the passcode)."; }
+  };
+}
+function bar(label, val, max, unit, cls) {
+  const w = max ? Math.max(2, 100 * val / max) : 0;
+  return `<div class="rbar"><span>${h(label)}</span><div><i class="${cls || ""}" style="width:${w}%"></i></div><b>${val ?? "–"}${unit || ""}</b></div>`;
+}
+function renderResults(v) {
+  const box = document.getElementById("resultsView");
+  const ov = Object.fromEntries((v.overall || []).map(o => [o.condition, o]));
+  const maxS = Math.max(1, ...(v.tasks || []).map(t => +t.avg_seconds));
+  const tasksBy = {}; (v.tasks || []).forEach(t => (tasksBy[t.task_key] ||= {})[t.condition] = t);
+  const L = v.likert || {};
+  const ratingTotal = Object.values(v.ratings || {}).reduce((a, b) => a + b, 0);
+  const lines = [];
+  lines.push(`Sessions: ${v.sessions} (${Object.entries(v.by_facilitator || {}).map(([k, n]) => k + " " + n).join(", ")})`);
+  if (ov.baseline && ov.ace) lines.push(`Average time per question: current way ${ov.baseline.avg_seconds} s vs ACE ${ov.ace.avg_seconds} s. Correct: ${ov.baseline.pct_correct}% vs ${ov.ace.pct_correct}%.`);
+  LIKERT.forEach(([k, t]) => L[k] != null && lines.push(`"${t}" mean ${L[k]} of 5`));
+  box.innerHTML = `<div class="eyebrow">Team only · ${v.sessions} sessions</div><h1 style="font-size:28px">User testing results</h1>
+    <p class="mono" style="color:var(--muted)">By facilitator: ${Object.entries(v.by_facilitator || {}).map(([k, n]) => `${h(k)} ${n}`).join(" · ") || "none yet"} &nbsp;|&nbsp; Methods: ${Object.entries(v.by_method || {}).map(([k, n]) => `${h(k)} ${n}`).join(" · ")}</p>
+    <div class="grid2">
+      <div class="card"><div class="lab">Average seconds per question (lower is better)</div>
+        ${Object.entries(tasksBy).map(([k, c]) => `<p style="margin:12px 0 4px"><b>${h(k)}</b></p>${bar("Current way", c.baseline?.avg_seconds, maxS, " s", "base")}${bar("With ACE", c.ace?.avg_seconds, maxS, " s")}`).join("") || "<p>No data yet</p>"}</div>
+      <div class="card"><div class="lab">Correct answers</div>
+        ${bar("Current way", ov.baseline?.pct_correct, 100, "%", "base")}${bar("With ACE", ov.ace?.pct_correct, 100, "%")}
+        <div class="lab" style="margin-top:20px">Brief accuracy (tester ratings, n=${ratingTotal})</div>
+        ${["accurate", "partly", "wrong", "skipped"].filter(k => v.ratings?.[k]).map(k => bar(k, v.ratings[k], ratingTotal, "", k === "accurate" ? "" : "base")).join("")}
+        <div class="lab" style="margin-top:20px">Preferred notification time</div>
+        ${Object.entries(v.notify_time || {}).sort((a, b) => b[1] - a[1]).map(([k, n]) => bar(k, n, v.likert?.n || 1)).join("")}</div>
+    </div>
+    <div class="card" style="margin-top:16px"><div class="lab">Survey means (1 = strongly disagree, 5 = strongly agree, n=${L.n || 0})</div>
+      ${LIKERT.map(([k, t]) => bar(t, L[k], 5)).join("")}</div>
+    <div class="card" style="margin-top:16px"><div class="lab">In their words</div>
+      <ul class="list">${(v.quotes || []).map(x => `<li style="display:block">${x.friend ? `"${h(x.friend)}"` : ""}${x.confusing ? `<br><span style="color:var(--muted)">Confusing: ${h(x.confusing)}</span>` : ""} <span class="mono" style="color:var(--dim)">(${h(x.role || "anon")}, ${h(x.facilitator || "")})</span></li>`).join("") || "<li>None yet</li>"}</ul></div>
+    <div class="card" style="margin-top:16px"><div class="lab">Summary for the report</div><pre id="rSum" style="white-space:pre-wrap;font:14px var(--sans)">${h(lines.join("\n"))}</pre>
+      <button class="btn" id="rCopy">Copy summary</button></div>`;
+  document.getElementById("rCopy").onclick = async () => { try { await navigator.clipboard.writeText(lines.join("\n")); document.getElementById("rCopy").textContent = "Copied"; } catch (e) { document.getElementById("rCopy").textContent = "Select the text above to copy"; } };
+}
+
+/* ===================== ADVISOR VIEW =====================
+   An advisor sees only their own advisees, sorted by who needs attention,
+   and a prep sheet before each appointment. Talking points are rule-based
+   (no AI), so advisors can see exactly why each one appears. */
+async function advCall(kind, arg) {
+  if (transport !== "mcp") {
+    try {
+      const v = kind === "advisors" ? await direct("/rest/v1/ace_advisors?select=*")
+                                    : await direct("/rest/v1/rpc/ace_advisor_caseload", { p_advisor: arg });
+      transport = "direct"; return v;
+    } catch (e) { if (transport === "direct") throw e; }
+  }
+  const lit = s => "'" + String(s).replace(/'/g, "''") + "'";
+  const rows = await viaMcp(kind === "advisors" ? "select coalesce(json_agg(a),'[]') as v from ace_advisors a"
+                                                : `select ace_advisor_caseload(${lit(arg)}) as v`);
+  transport = "mcp"; let v = rows[0]?.v; if (typeof v === "string") v = JSON.parse(v); return v;
+}
+const HOLD_NAMES = { advising: "Advising hold", bursar: "Bursar hold", ccp: "CCP form missing", immunization: "Immunization hold", admissions: "Admissions hold" };
+
+async function advInit() {
+  const box = document.getElementById("advView");
+  box.innerHTML = `<div class="eyebrow">ACE for advisors</div>
+    <div class="headrow"><h1 style="font-size:32px">Before your appointments</h1>
+      <label class="tl" style="margin:0;min-width:240px">Signed in as (demo)<select id="advSel"></select></label></div>
+    <p style="color:var(--muted);max-width:780px;margin-top:-6px">ACE sends students their routine reminders, so appointments can focus on bigger decisions. You see only your own advisees, sorted by who may need you first.</p>
+    <div class="chips" id="advStats"></div>
+    <div class="advgrid"><div id="advList" class="advlist" aria-label="Advisees"></div><div id="advPrep" class="card advprep" aria-live="polite"><p style="color:var(--muted)">Choose a student to see a prep sheet.</p></div></div>`;
+  let advisors = [];
+  try { advisors = await advCall("advisors"); } catch (e) { box.querySelector("#advList").innerHTML = `<p>Couldn't load advisors.</p>`; return; }
+  const sel = document.getElementById("advSel");
+  sel.innerHTML = advisors.map(a => `<option>${h(a.name)}</option>`).join("");
+  sel.onchange = () => advLoad(sel.value);
+  advLoad(advisors[0].name);
+}
+async function advLoad(name) {
+  const list = document.getElementById("advList");
+  list.innerHTML = `<p style="color:var(--muted)">Loading…</p>`;
+  const v = await advCall("caseload", name);
+  const S = v.students;
+  const n = f => S.filter(f).length;
+  document.getElementById("advStats").innerHTML = [
+    [`${S.length}`, "advisees"], [n(s => s.holds.length), "with a hold"], [n(s => s.alerts > 0), "with an instructor alert"],
+    [n(s => s.overdue > 0), "with overdue work"], [n(s => s.reg_days >= 0 && s.reg_days <= 14), "registering in the next 2 weeks"],
+  ].map(([k, t]) => `<span class="chip"><b>${k}</b> ${t}</span>`).join("");
+  list.innerHTML = S.map(s => {
+    const flags = [
+      ...s.holds.map(k => `<span class="flag red">${h(HOLD_NAMES[k] || k)}</span>`),
+      s.alerts ? `<span class="flag red">Instructor alert</span>` : "",
+      s.overdue ? `<span class="flag orange">${s.overdue} overdue</span>` : "",
+      s.low_score != null && s.low_score < 75 ? `<span class="flag orange">Low grade ${Math.round(s.low_score)}%</span>` : "",
+      s.reg_days >= 0 && s.reg_days <= 14 ? `<span class="flag blue">Registers in ${s.reg_days}d</span>` : "",
+      s.first_generation ? `<span class="flag">First-gen</span>` : "", s.transfer ? `<span class="flag">Transfer</span>` : "",
+      s.college_credit_plus ? `<span class="flag">CCP</span>` : "",
+    ].join("");
+    return `<button class="advrow ${s.attention >= 6 ? "hot" : ""}" data-sid="${s.id}">
+      <span class="advname">${h(s.first_name)} ${h(s.last_name)}${s.is_persona ? ' <span class="mono" style="color:var(--gold)">demo</span>' : ""}</span>
+      <span class="advmeta">${h(s.class_level)} · ${h(s.major)} · ${h(s.campus)}</span>
+      <span class="flags">${flags || '<span class="flag ok">Nothing flagged</span>'}</span></button>`;
+  }).join("");
+  list.querySelectorAll(".advrow").forEach(b => b.onclick = () => {
+    list.querySelectorAll(".advrow").forEach(x => x.removeAttribute("aria-current")); b.setAttribute("aria-current", "true");
+    advPrep(b.dataset.sid);
+  });
+  const first = list.querySelector(".advrow"); if (first) first.click();
+}
+async function advPrep(id) {
+  const P = document.getElementById("advPrep");
+  P.innerHTML = `<p style="color:var(--muted)">Loading…</p>`;
+  const s = await q("snapshot", id), st = s.student;
+  const overdue = s.upcoming.filter(u => u.days_until < 0);
+  const low = [...s.courses].sort((a, b) => a.current_score - b.current_score).slice(0, 2);
+  const gaps = s.gps_audit.filter(g => g.status === "still_needed");
+  const pts = [];
+  s.holds.forEach(x => pts.push(`Resolve the ${(HOLD_NAMES[x.kind] || x.kind).toLowerCase()}${s.registration && s.registration.days_until >= 0 ? ` before registration opens in ${s.registration.days_until} days` : ""}. Fix: ${x.resolve_at}.`));
+  s.early_alerts.forEach(a => pts.push(`Follow up on ${a.raised_by}'s concern in ${a.course}: ${a.reason.toLowerCase()}.`));
+  if (overdue.length) pts.push(`${overdue.length} overdue assignment${overdue.length > 1 ? "s" : ""}. Ask about workload and late-work options.`);
+  const WRITING = ["ENG", "COMM", "JMC", "HIST", "PHIL"];
+  const helpFor = c => WRITING.includes(c.course.split(" ")[0])
+    ? s.support_services.find(x => x.kind === "writing")
+    : s.support_services.find(x => x.kind === "tutoring");
+  low.filter(c => c.current_score < 80).forEach(c => { const sv = helpFor(c);
+    pts.push(`Check in on ${c.course} (${Math.round(c.current_score)}%).${sv ? ` Suggest ${sv.name} (${sv.hours}).` : ""}`); });
+  gaps.forEach(g => pts.push(g.block === "Transfer" ? `Confirm the transfer credit evaluation: ${g.requirement}.` : `Plan Spring courses for ${g.requirement} (${g.completed} of ${g.required} credits done).`));
+  if (st.expected_grad_term === "May 2027") pts.push("Confirm the graduation application is filed.");
+  if (st.first_generation) pts.push("First-generation student: make sure they know which support services exist.");
+  if (st.college_credit_plus) pts.push("CCP student: review CCP-only deadlines with their high school counselor in mind.");
+  const brief = s.fallback_brief;
+  P.innerHTML = `<div class="eyebrow">Prep sheet · synthetic student</div>
+    <h2 style="font-size:24px;margin:4px 0">${h(st.first_name)} ${h(st.last_name)}</h2>
+    <p style="color:var(--muted);margin:0">${h(st.class_level)} · ${h(st.major)}${st.minor ? " · minor " + h(st.minor) : ""} · ${h(st.campus)} · ${st.credits_earned} of ${st.credits_required} credits${st.gpa ? " · GPA " + st.gpa : ""}${st.expected_grad_term ? " · expected " + h(st.expected_grad_term) : ""}</p>
+    <h3 class="psec">Talking points</h3>
+    <ol class="pts">${pts.map(p => `<li>${h(p)}</li>`).join("") || "<li>Nothing urgent. A good time for longer-term planning.</li>"}</ol>
+    <h3 class="psec">What ACE told ${h(st.first_name)} this morning</h3>
+    <ul class="list">${brief ? brief.items.map(i => `<li style="display:block"><b>${h(i.title)}</b><br><span style="color:var(--muted);font-size:14px">${h(i.detail)} · ${h(i.source)}</span></li>`).join("") : "<li>No brief</li>"}</ul>
+    <div class="grid2eq">
+      <div><h3 class="psec">Current grades</h3><ul class="list">${s.courses.map(c => `<li><span>${h(c.course)} ${h(c.title)}</span><span style="${c.current_score < 75 ? "color:var(--orange);font-weight:700" : ""}">${Math.round(c.current_score)}%</span></li>`).join("")}</ul></div>
+      <div><h3 class="psec">Degree progress</h3><ul class="list">${s.gps_audit.map(g => `<li><span>${h(g.requirement)}</span><span style="${g.status === "still_needed" ? "color:var(--orange);font-weight:700" : ""}">${g.completed}/${g.required}</span></li>`).join("")}</ul></div>
+    </div>
+    <p class="foot">Talking points come from fixed rules, not AI, so you can see why each one is here. Advisors see only their own advisees. All data on this page is synthetic.</p>`;
+}
+
+async function init() {
+  // tabs
+  const tabs = [...document.querySelectorAll('[role=tab]')];
+  tabs.forEach((t, i) => {
+    t.onclick = () => { tabs.forEach(x => { x.setAttribute("aria-selected", x === t); document.getElementById(x.getAttribute("aria-controls")).hidden = x !== t; });
+      document.getElementById("demobar").hidden = ["t-adv", "t-test", "t-results"].includes(t.id); };
+    t.onkeydown = e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length]; n.focus(); n.click(); } };
+  });
+  document.getElementById("t-adv").addEventListener("click", () => { if (!document.getElementById("advView").innerHTML) advInit(); });
+  document.getElementById("t-test").addEventListener("click", () => { if (!document.getElementById("testView").innerHTML) testStart(); });
+  document.getElementById("t-results").addEventListener("click", () => { if (!document.getElementById("resultsView").innerHTML) resultsInit(); });
+  const route = () => {
+    document.body.classList.toggle("testing", location.hash === "#test");
+    if (location.hash === "#test") document.getElementById("t-test").click();
+    if (location.hash === "#results") document.getElementById("t-results").click();
+  };
+  route(); addEventListener("hashchange", route);
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-act]");
+    if (b) toast(b.dataset.act, `In the live version this opens ${b.dataset.src.split("+")[0].trim()} with the student's existing login. ACE only links out; the student completes the task in the original system.`);
+  });
+  const lock = document.getElementById("lock"), panel = document.getElementById("panel");
+  document.getElementById("push").onclick = () => { lock.hidden = true; panel.hidden = false; document.getElementById("relock").focus(); };
+  document.getElementById("relock").onclick = () => { panel.hidden = true; lock.hidden = false; document.getElementById("push").focus(); };
+  document.getElementById("notifyTime").onchange = renderPush;
+  document.getElementById("regen").onclick = () => state.snap && loadStudent(state.snap.student.id, true);
+  renderBrief(true);
+  try {
+    state.personas = await q("personas");
+  } catch (e) { state.personas = []; }
+  const chips = document.getElementById("personaChips");
+  chips.innerHTML = state.personas.map((p, i) => `<button type="button" class="pchip" data-pid="${p.id}" aria-pressed="${i === 0}"><b>${h(p.first_name)}</b><small>${h((p.persona_label || "").split("·").pop().trim())}</small></button>`).join("");
+  chips.querySelectorAll(".pchip").forEach(b => b.onclick = () => {
+    chips.querySelectorAll(".pchip").forEach(x => x.setAttribute("aria-pressed", x === b));
+    loadStudent(b.dataset.pid);
+  });
+  if (state.personas.length) loadStudent(state.personas[0].id);
+  else loadStudent("none");
+}
+init();
+</script>
+</body>
+</html>

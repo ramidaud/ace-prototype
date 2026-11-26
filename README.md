@@ -69,7 +69,7 @@ The pill next to the headline shows which one is active.
 
 ## User testing
 
-Open the tester link, choose the facilitator and method, then hand over the device. Each session runs two counterbalanced rounds ("current way" across six mock portals vs. ACE) with three timed questions each, an accuracy check on ACE's picks, a five-item Likert survey and optional demographics. Results are anonymous and visible only in the **Results** tab with the team passcode.
+Open the tester link, choose the facilitator and method, then hand over the device. Each session runs two counterbalanced rounds ("current way" across six mock portals vs. ACE) with three timed questions each (each round opens on a "look over their information" step; timing starts at "Show question"), an accuracy check on ACE's picks, a five-item Likert survey and optional demographics. Results are anonymous and visible only in the **Results** tab with the team passcode.
 
 ## Advisor view
 

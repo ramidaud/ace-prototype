@@ -297,6 +297,10 @@ body.testing .demobar{display:none}
 .qbar{position:sticky;top:0;z-index:5;background:#101216;border:1px solid var(--gold);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
 .qbar .mono{color:var(--muted);margin-bottom:6px}
 .qbar b{display:block;font-size:18px;outline:none}
+.qbar .qmeta{display:flex;justify-content:space-between;gap:12px}
+.qbar .qtime{color:var(--gold);font-variant-numeric:tabular-nums}
+.qbar.look{border-color:var(--blue,#7aa7ff)}
+.qbar.look p{margin:6px 0 12px;color:#d5d9e0}
 .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .opt{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;font-size:14px}
 .opt:hover{border-color:var(--gold)}
@@ -929,8 +933,8 @@ function baselineHTML(s) {
       <li>Dynamic Checklist: 4 items</li><li>Bursar: view account statement</li><li>Kent State Today: latest news</li></ul>`,
     Canvas: `<h3>Canvas · Courses</h3>` + Object.entries(byCourse).sort().map(([c, list]) => `<div class="rawcard"><b>${h(c)}</b><ul class="raw">${
       list.sort((a, b) => a.title.localeCompare(b.title)).map(a => `<li>${h(a.title)} · ${a.done ? `graded ${a.score}/${a.points}` : `due ${etDate(a.due_at)}`}</li>`).join("")}</ul></div>`).join(""),
-    "GPS audit": `<h3>GPS degree audit</h3><ul class="raw">${s.gps_audit.map(g => `<li>${h(g.block)} · ${h(g.requirement)}: ${g.completed}/${g.required} complete, ${g.in_progress} in progress</li>`).join("")}</ul>`,
-    "Schedule Builder": `<h3>Visual Schedule Builder · Spring 2027</h3><ul class="raw">${(s.spring_sections_for_open_core.length ? s.spring_sections_for_open_core : [{ course: "Search for courses", title: "", days: "", time: "", seats_open: "" }])
+    "GPS audit": `<h3>GPS degree audit</h3><ul class="raw">${(s.gps_audit || []).map(g => `<li>${h(g.block)} · ${h(g.requirement)}: ${g.completed}/${g.required} complete, ${g.in_progress} in progress</li>`).join("")}</ul>`,
+    "Schedule Builder": `<h3>Visual Schedule Builder · Spring 2027</h3><ul class="raw">${((s.spring_sections_for_open_core || []).length ? s.spring_sections_for_open_core : [{ course: "Search for courses", title: "", days: "", time: "", seats_open: "" }])
       .map(x => `<li>${h(x.course)} ${h(x.title)} · ${h(x.days)} ${h(x.time)} ${x.seats_open !== "" ? "· " + x.seats_open + " seats" : ""}</li>`).join("")}</ul>`,
     Navigate360: `<h3>KSU Navigate</h3><ul class="raw">${s.support_services.map(x => `<li>${h(x.name)} · ${h(x.hours)}</li>`).join("")}
       ${s.early_alerts.map(a => `<li>Progress report from ${h(a.raised_by)}</li>`).join("")}<li>Appointments: ${s.appointments.length} past</li></ul>`,
@@ -990,29 +994,50 @@ function testRoundIntro(r) {
     : "<b>the current way</b>: the same information spread across six Kent systems. Tap the tabs to look around.";
   tv().innerHTML = `<div class="tcard"><div class="eyebrow">Round ${r + 1} of 2</div><h1 style="font-size:28px">Meet ${h(R.persona.name)}</h1>
     <p>${h(T.snaps[R.persona.name].student.class_level)} · ${h(T.snaps[R.persona.name].student.major)} · ${h(T.snaps[R.persona.name].student.campus)} campus</p><p>This round you'll use ${what}</p>
-    <p>Three questions. Answer as quickly as you can. If you can't find something, choose "I couldn't find it."</p>
+    <p>First you'll look over their information. When you're ready, tap "Show question" and the timer starts. Three questions, answer as quickly as you can. If you can't find something, choose "I couldn't find it."</p>
     <button class="btn primary" id="tR">Start round ${r + 1}</button></div>`;
   document.getElementById("tR").onclick = () => testTask(r, 0);
 }
 function testTask(r, k) {
   const R = T.rounds[r], s = T.snaps[R.persona.name], tasks = buildTasks(s), task = tasks[k];
   const brief = (T.briefs[R.persona.name] || { brief: s.fallback_brief }).brief;
-  let clicks = 0; const t0 = performance.now();
-  tv().innerHTML = `<div class="qbar" role="region" aria-label="Question"><div class="mono">Round ${r + 1} · question ${k + 1} of 3 · ${h(R.persona.name)} · today is ${new Date(s.today + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</div>
-      <b id="qText">${h(task.q)}</b><div class="opts">${[...task.opts, "I couldn't find it"].map((o, i) => `<button class="opt" data-i="${i}">${h(o)}</button>`).join("")}</div></div>
-    <div class="stage">${R.condition === "ace" ? aceHTML(s, brief) : baselineHTML(s)}</div>`;
+  const day = new Date(s.today + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const meta = `Round ${r + 1} · question ${k + 1} of 3 · ${h(R.persona.name)} · today is ${day}`;
+  let clicks = 0, t0 = null, tick = null;
+  tv().innerHTML = `<div id="tBar"></div><div class="stage">${R.condition === "ace" ? aceHTML(s, brief) : baselineHTML(s)}</div>`;
   tv().querySelectorAll("[data-portal]").forEach(b => b.onclick = () => {
-    clicks++; tv().querySelectorAll("[data-portal]").forEach(x => x.setAttribute("aria-selected", x === b));
+    if (t0 !== null) clicks++;
+    tv().querySelectorAll("[data-portal]").forEach(x => x.setAttribute("aria-selected", x === b));
     tv().querySelectorAll("[data-pane]").forEach(p => p.hidden = p.dataset.pane !== b.dataset.portal);
   });
-  tv().querySelector(".stage").addEventListener("click", e => { if (e.target.closest("summary,[data-act]")) clicks++; });
-  const all = [...task.opts, "I couldn't find it"];
-  tv().querySelectorAll(".opt").forEach(b => b.onclick = () => {
-    const ans = all[+b.dataset.i];
-    T.tasks.push({ condition: R.condition, persona: R.persona.name, task_key: task.key, seconds: +((performance.now() - t0) / 1000).toFixed(2), correct: ans === task.correct, clicks, answer: ans });
-    if (k < 2) testTask(r, k + 1); else if (r === 0) testRoundIntro(1); else testRate();
-  });
-  document.getElementById("qText").focus?.();
+  tv().querySelector(".stage").addEventListener("click", e => { if (t0 !== null && e.target.closest("summary,[data-act]")) clicks++; });
+  const bar = document.getElementById("tBar");
+  // the question, its timer and click counting all start here, never before
+  function showQuestion() {
+    const all = [...task.opts, "I couldn't find it"];
+    bar.innerHTML = `<div class="qbar" role="region" aria-label="Question"><div class="mono qmeta"><span>${meta}</span><span class="qtime" id="qTime" aria-hidden="true">0:00</span></div>
+      <b id="qText" tabindex="-1">${h(task.q)}</b><div class="opts">${all.map((o, i) => `<button class="opt" data-i="${i}">${h(o)}</button>`).join("")}</div></div>`;
+    t0 = performance.now(); clicks = 0;
+    const el = document.getElementById("qTime");
+    tick = setInterval(() => { const sec = Math.floor((performance.now() - t0) / 1000); el.textContent = `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`; }, 250);
+    bar.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+      clearInterval(tick);
+      const ans = all[+b.dataset.i];
+      T.tasks.push({ condition: R.condition, persona: R.persona.name, task_key: task.key, seconds: +((performance.now() - t0) / 1000).toFixed(2), correct: ans === task.correct, clicks, answer: ans });
+      if (k < 2) testTask(r, k + 1); else if (r === 0) testRoundIntro(1); else testRate();
+    });
+    document.getElementById("qText").focus({ preventScroll: true });
+  }
+  if (k > 0) { showQuestion(); return; }
+  // first question of each round: look around before any question or timer appears
+  const how = R.condition === "ace" ? "This is ACE. Scroll through it and open Details if you like."
+    : "This is the current way. Tap the tabs to see each Kent system.";
+  bar.innerHTML = `<div class="qbar look" role="region" aria-label="Look over their information"><div class="mono">Round ${r + 1} · ${h(R.persona.name)} · today is ${day}</div>
+    <b tabindex="-1" id="lookText">Look over ${h(R.persona.name)}'s information</b>
+    <p>${how} Take a moment to get your bearings. No timer is running yet.</p>
+    <button class="btn primary" id="tShowQ">Show question</button></div>`;
+  document.getElementById("tShowQ").onclick = showQuestion;
+  document.getElementById("lookText").focus({ preventScroll: true });
 }
 function testRate() {
   const aceP = T.rounds.find(r => r.condition === "ace").persona.name;
